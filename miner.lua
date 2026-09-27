@@ -16,7 +16,7 @@ local function ask(prompt)
       ["Content-Type"] = "application/json", ["X-Miner-Token"] = TOKEN,
       ["ngrok-skip-browser-warning"] = "true"
     },
-    timeout = 150
+    timeout = 60
   }
   if not response and failed then response = failed end
   if not response then error("Conexao: " .. tostring(err)) end

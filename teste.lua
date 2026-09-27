@@ -1,1 +1,0 @@
-r,e,f=http.post("https://strength-ranging-buddhist.ngrok-free.dev",'{"prompt":"abra um tunel de 3 blocos"}',{["Content-Type"]="application/json",["X-Miner-Token"]="SEU_TOKEN",["ngrok-skip-browser-warning"]="true"}); h=r or f; print("STATUS",h and h.getResponseCode(),"ERRO",e); if h then print(h.readAll()); h.close() end
