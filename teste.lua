@@ -1,5 +1,1 @@
-url = "https://strength-ranging-buddhist.ngrok-free.dev"
-token = "123"
-r, erro, falha = http.post(url, '{"prompt":"abra um tunel de 3 blocos"}', {["Content-Type"]="application/json", ["X-Miner-Token"]=token, ["ngrok-skip-browser-warning"]="true"})
-print("Status:", (r or falha) and (r or falha).getResponseCode(), "Erro:", erro)
-if r or falha then print((r or falha).readAll()); (r or falha).close() end
+r,e,f=http.post("https://strength-ranging-buddhist.ngrok-free.dev",'{"prompt":"abra um tunel de 3 blocos"}',{["Content-Type"]="application/json",["X-Miner-Token"]="SEU_TOKEN",["ngrok-skip-browser-warning"]="true"}); h=r or f; print("STATUS",h and h.getResponseCode(),"ERRO",e); if h then print(h.readAll()); h.close() end
