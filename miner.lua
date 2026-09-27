@@ -9,10 +9,16 @@ if SERVER:find("SEU%-ENDERECO") or TOKEN == "COLOQUE_O_MESMO_TOKEN_DO_SERVIDOR" 
 end
 
 local function ask(prompt)
-  local response, err = http.post(SERVER .. "/plan", textutils.serialiseJSON({prompt=prompt}), {
-    ["Content-Type"] = "application/json", ["X-Miner-Token"] = TOKEN,
-    ["ngrok-skip-browser-warning"] = "true"
-  })
+  local response, err, failed = http.post {
+    url = SERVER .. "/plan",
+    body = textutils.serialiseJSON({prompt=prompt}),
+    headers = {
+      ["Content-Type"] = "application/json", ["X-Miner-Token"] = TOKEN,
+      ["ngrok-skip-browser-warning"] = "true"
+    },
+    timeout = 150
+  }
+  if not response and failed then response = failed end
   if not response then error("Conexao: " .. tostring(err)) end
   local body = response.readAll()
   local status = response.getResponseCode()

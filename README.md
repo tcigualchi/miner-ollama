@@ -14,7 +14,7 @@ Primeira versao: a Mining Turtle escava um tunel reto de 2 blocos de altura por 
    No PowerShell, use `$env:MINER_TOKEN='escolha-uma-senha-longa-aleatoria'` e `$env:OLLAMA_MODEL='qwen3:4b'`, depois `python server.py`.
 3. Em outro terminal, publique somente o servidor Python: `ngrok http 8765`. Copie a URL HTTPS gerada.
 
-O servidor Python se conecta ao Ollama localmente. Nao publique a porta 11434 do Ollama.
+O servidor Python pede ao Ollama uma resposta sem modo de raciocinio e mantem o modelo carregado por 15 minutos. O servidor Python se conecta ao Ollama localmente. Nao publique a porta 11434 do Ollama.
 
 ## Na Mining Turtle
 
@@ -28,3 +28,7 @@ O endereco gratuito do ngrok pode mudar entre inicializacoes. Atualize `SERVER` 
 ## Limites
 
 Nao remove obstaculos no retorno e nao deposita itens em bau. Para escavacao extensa, exploracao de minerios, GPS, recarga e retomada apos reinicio, essas funcoes precisam de uma proxima etapa.
+
+## Se aparecer connection timed out
+
+A turtle espera ate 150 segundos pela resposta. Verifique no terminal do Python se o POST /plan terminou em 200 ou 502, execute `ollama list` e teste `ollama run qwen3:4b "retorne apenas oi"` no Windows. Confirme que o ngrok aponta para a mesma porta configurada em PORT.

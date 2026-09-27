@@ -45,6 +45,8 @@ class Handler(BaseHTTPRequestHandler):
             payload = {
                 'model': MODEL,
                 'stream': False,
+                'think': False,
+                'keep_alive': '15m',
                 'format': SCHEMA,
                 'prompt': ('Converta o pedido em uma tarefa para uma turtle de Minecraft. '
                            'Somente tarefa tunnel (tunel reto de 2 blocos de altura, comprimento em blocos) '
