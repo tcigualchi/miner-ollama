@@ -4,6 +4,7 @@ import json
 import os
 import re
 import secrets
+import time
 from collections import Counter, deque
 from pathlib import Path
 from typing import Any
@@ -417,6 +418,7 @@ async def api_status(
         "inventory": as_dict(raw.get("inventory")),
         "extra": as_dict(raw.get("extra")),
         "timestamp": as_int(raw.get("timestamp")),
+        "server_received_ms": int(time.time() * 1000),
     }
 
     key = f"{controller_id}:{turtle_id}"

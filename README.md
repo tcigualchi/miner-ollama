@@ -1,28 +1,148 @@
 # CC Fleet AI v2
 
-Painel para controlar turtles do CC:Tweaked com construção via Ollama, navegação, escavação linear e quarry. A frota, a fila e os eventos são atualizados automaticamente no navegador.
+Versao ampliada com:
 
-## Instalação
+- site estilo pixel art
+- painel de frota em tempo quase real
+- status de todas as turtles
+- comandos de construcao com IA
+- goto
+- dig line
+- quarry
+- Pocket Computer atualizado
+- UTF-8 em todo o site para evitar caracteres quebrados
 
-No computador que hospeda o servidor:
+## O que mudou em relacao a v1
 
-1. Instale as dependências com `python -m pip install -r server/requirements.txt`.
-2. Instale o ngrok, autentique uma vez com `ngrok config add-authtoken SEU_TOKEN` e verifique que `ngrok` está no PATH. Se estiver em outro local, defina a variável `NGROK_PATH` com o caminho de `ngrok.exe`.
-3. Configure `FLEET_TOKEN` e `WEB_PASSWORD` em `server/run.ps1` ou nas variáveis de ambiente. Use valores fortes diferentes dos exemplos.
-4. Para construção com IA, instale Ollama e execute `ollama pull qwen3:4b`.
-5. Execute `server/run.bat` com duplo clique, ou rode `powershell -File server/run.ps1` na raiz do projeto.
+### Dashboard web
 
-O inicializador abre o servidor e o túnel ngrok, aguarda os dois ficarem prontos e mostra as URLs local e pública. Ao interromper, encerra ambos. A URL do ngrok gratuito pode mudar entre execuções. Copie a URL mostrada para `server_url` em `central/config.lua` e `turtle/config.lua`; se quiser uma URL permanente, configure um domínio estático no ngrok.
+O servidor agora recebe status do PC central e mostra:
 
-## ComputerCraft
+- estado atual de cada turtle
+- posicao X/Y/Z
+- combustivel
+- extras (destino, plan_id, progresso, etc.)
+- fila de comandos pendentes
+- eventos recentes
 
-- Copie os arquivos de `central/` para o PC central e configure `central/config.lua` com a URL pública e o mesmo `FLEET_TOKEN`.
-- Copie `turtle/` para a turtle, mantendo `lib/`, e configure `turtle/config.lua` com o ID da central, a URL pública e o token.
-- Copie `pocket/` para o Pocket Computer, se quiser controle pelo jogo.
-- É necessário um modem wireless; o GPS melhora a navegação e permite exibir coordenadas.
+### Novos comandos
 
-## Painel
+- `goto`
+- `build`
+- `dig_line`
+- `quarry`
+- `reboot`
 
-Abra a URL exibida no terminal. Use a senha do painel e os IDs da central e da turtle para enviar comandos. O painel oferece construção com IA, navegação, escavação linear e quarry. A quarry limpa uma área no plano atual em serpentina com a altura configurada.
+## Observacao importante sobre quarry
 
-O status da turtle aceita inventário e detalhes vazios enviados pelo ComputerCraft, mesmo quando o JSON usa `[]` para tabelas Lua vazias. Para aplicar também a correção de envio e a mensagem de erro no terminal, atualize `central/controller.lua` no PC central.
+Nesta versao, o comando `quarry` limpa a area em serpentina no plano atual e abre altura configuravel.
+Ele e intencionalmente conservador para nao destruir sua propria base por acidente.
+Se quiser, a proxima iteracao pode virar uma quarry 3D completa por camadas com retorno automatico ao bau.
+
+## Instalação rápida
+
+### Servidor
+
+Na pasta `server`:
+
+```powershell
+python -m pip install -r requirements.txt
+ollama pull qwen3:4b
+```
+
+Edite `run.ps1` e troque:
+
+- `FLEET_TOKEN`
+- `WEB_PASSWORD`
+
+Rode:
+
+```powershell
+.
+un.ps1
+```
+
+Se for usar ngrok:
+
+```powershell
+ngrok http 8000
+```
+
+### PC central
+
+Copie:
+
+- `central/config.lua`
+- `central/controller.lua`
+- `central/startup.lua`
+
+Edite `config.lua` com:
+
+- URL do ngrok
+- mesmo token do servidor
+
+### Turtle
+
+Copie tudo da pasta `turtle/` mantendo a pasta `lib/`.
+
+Edite `turtle/config.lua`:
+
+- `controller_id` = ID do PC central
+- `server_url` = URL do ngrok
+- `fleet_token` = mesmo token
+- `turtle_name` = nome unico
+
+### Pocket
+
+Copie `pocket/` e configure o ID do central.
+
+## Exemplos de uso no site
+
+### Construção com IA
+
+```text
+Casa medieval 13x11, dois andares, paredes de spruce, janelas grandes e telhado.
+```
+
+### Goto
+
+- Controller ID: 8
+- Turtle ID: 0
+- X/Y/Z desejados
+
+### Dig line
+
+- comprimento: 20
+- altura: 2
+
+### Quarry
+
+- largura: 8
+- profundidade: 12
+- altura: 3
+
+## Comandos do central
+
+```text
+list
+ping <id>
+goto <id> <x> <y> <z>
+dig <id> <len> [altura]
+quarry <id> <w> <d> [altura]
+build <id> <plan_id>
+reboot <id>
+```
+
+
+## v2.3 - Telemetria e quebra de bloqueios
+
+- `build_dig_obstacles = true`: durante construções, a turtle pode quebrar blocos que bloqueiam seu deslocamento.
+- Status a cada 1 segundo.
+- Progresso por bloco em construções.
+- Progresso de `dig_line` e `quarry`.
+- Painel atualizado a cada 1 segundo.
+- Exibe posição, combustível, inventário, ação atual, progresso e online/offline.
+
+### Atenção
+
+Permitir quebra durante a construção é agressivo. Se a rota da turtle atravessar uma parte já construída, ela também pode quebrar esse bloco para passar. Use uma área de construção livre ou mantenha `build_dig_obstacles = false` quando quiser preservar absolutamente tudo ao redor.

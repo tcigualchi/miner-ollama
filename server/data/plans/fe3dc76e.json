@@ -1,0 +1,5407 @@
+{
+  "id": "fe3dc76e",
+  "prompt": "Crie uma construção no estilo casa-templo chinês para Minecraft, com aparência elegante, simétrica e tradicional. Quero uma estrutura inspirada em templos chineses, com telhado grande e marcante, visual oriental, madeira escura, detalhes em pedra e bastante sensação de templo antigo. A construção deve ter 15 blocos de largura por 13 de profundidade, 2 andares, paredes principais de spruce ou dark oak, base com stone bricks, janelas bem distribuídas, entrada central destacada e telhado imponente. O interior deve parecer uma casa-templo, com piso bonito e estrutura bem organizada. Priorize estética tradicional chinesa, sensação de templo, simetria, elegância e visual robusto.",
+  "origin": {
+    "x": 455,
+    "y": 253,
+    "z": 347
+  },
+  "spec": {
+    "name": "ChineseTemple",
+    "style": "medieval",
+    "width": 15,
+    "depth": 13,
+    "floors": 2,
+    "floor_height": 4,
+    "materials": {
+      "wall": "minecraft:oak_planks",
+      "floor": "minecraft:oak_planks",
+      "roof": "minecraft:spruce_planks",
+      "window": "minecraft:glass",
+      "door": "minecraft:oak_door"
+    },
+    "features": {
+      "windows": true,
+      "door": true,
+      "roof": true,
+      "interior_floor": true
+    }
+  },
+  "materials": {
+    "minecraft:oak_planks": 678,
+    "minecraft:glass": 22,
+    "minecraft:spruce_planks": 195
+  },
+  "placements": [
+    {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 13,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 2,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 2,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 6,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 6,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 10,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 10,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 13,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 13,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 2,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 2,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 6,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 6,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 10,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 10,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:glass"
+    },
+    {
+      "x": 13,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 0,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 1,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 2,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 3,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 4,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 5,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 6,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 7,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 8,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 9,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 10,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 11,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 13,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "z": 12,
+      "block": "minecraft:oak_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 0,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "z": 12,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 1,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "z": 11,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 2,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "z": 10,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "z": 3,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "z": 9,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 12,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 12,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 12,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 12,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 12,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "z": 4,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 12,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 12,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 12,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 12,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 12,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "z": 8,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 13,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 13,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 13,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "z": 5,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 13,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 5,
+      "y": 13,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 13,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 13,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "z": 7,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 6,
+      "y": 14,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 7,
+      "y": 14,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    },
+    {
+      "x": 8,
+      "y": 14,
+      "z": 6,
+      "block": "minecraft:spruce_planks"
+    }
+  ]
+}
