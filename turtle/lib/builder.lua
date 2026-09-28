@@ -83,7 +83,9 @@ local function placeTarget(itemName, report)
     local ok, why = turtle.digDown()
 
     if not ok then
-      return false, "Nao consegui remover bloco existente: " .. tostring(why)
+      return false,
+        "Nao consegui remover bloco existente no ponto da construcao: " ..
+        tostring(why)
     end
   end
 
@@ -99,7 +101,9 @@ end
 function M.buildPlan(planId, reportFn)
   local report = reportFn or defaultReport
 
-  local plan, err = apiGet("/api/plans/" .. textutils.urlEncode(planId))
+  local plan, err = apiGet(
+    "/api/plans/" .. textutils.urlEncode(planId)
+  )
 
   if not plan then
     return false, err
@@ -113,6 +117,10 @@ function M.buildPlan(planId, reportFn)
   local oy = plan.origin.y
   local oz = plan.origin.z
   local total = #plan.placements
+
+  -- A turtle sempre trabalha um bloco acima do bloco que sera colocado.
+  -- Portanto este e o Y minimo seguro da turtle durante esta obra.
+  local safeMinY = oy + 1
 
   table.sort(plan.placements, function(a, b)
     if a.y ~= b.y then
@@ -131,63 +139,118 @@ function M.buildPlan(planId, reportFn)
     action = "starting",
     done = 0,
     total = total,
-    progress = 0
+    progress = 0,
+    safe_min_y = safeMinY
   })
 
   print("Construindo plano:", planId)
   print("Blocos:", total)
+  print("Y minimo seguro:", safeMinY)
 
   for i, p in ipairs(plan.placements) do
-    local tx = ox + p.x
-    local ty = oy + p.y + 1
-    local tz = oz + p.z
+    local blockX = ox + p.x
+    local blockY = oy + p.y
+    local blockZ = oz + p.z
+
+    local turtleX = blockX
+    local turtleY = blockY + 1
+    local turtleZ = blockZ
 
     report("BUILDING", {
       plan_id = planId,
       action = "moving_to_block",
       target_block = p.block,
-      target = {
-        x = tx,
-        y = ty - 1,
-        z = tz
+
+      block_target = {
+        x = blockX,
+        y = blockY,
+        z = blockZ
       },
+
+      turtle_target = {
+        x = turtleX,
+        y = turtleY,
+        z = turtleZ
+      },
+
       done = i - 1,
       total = total,
-      progress = math.floor(((i - 1) * 100) / math.max(total, 1))
+      progress = math.floor(
+        ((i - 1) * 100) / math.max(total, 1)
+      )
     })
 
-    -- IMPORTANTE:
-    -- build_dig_obstacles=true permite quebrar blocos que bloqueiam
-    -- frente/cima/baixo durante o caminho ate o proximo ponto.
-    local ok, why = nav.gotoXYZ(tx, ty, tz, {
-      dig = cfg.build_dig_obstacles == true
-    })
+    -- Modo seguro de construcao:
+    --   * pode quebrar na frente;
+    --   * pode quebrar acima;
+    --   * NUNCA cava para baixo para navegar;
+    --   * nunca desce abaixo de oy + 1;
+    --   * verifica GPS durante cada movimento.
+    local ok, why = nav.gotoXYZ(
+      turtleX,
+      turtleY,
+      turtleZ,
+      {
+        digForward = cfg.build_dig_obstacles == true,
+        digUp = cfg.build_dig_obstacles == true,
+        digDown = false,
+        minY = safeMinY,
+        verify = true
+      }
+    )
 
     if not ok then
+      local ax, ay, az = nav.locate()
+
       report("ERROR", {
         plan_id = planId,
         action = "movement_failed",
         index = i,
         total = total,
-        error = why
+        error = why,
+
+        current = {
+          x = ax,
+          y = ay,
+          z = az
+        },
+
+        turtle_target = {
+          x = turtleX,
+          y = turtleY,
+          z = turtleZ
+        }
       })
 
-      return false, ("Movimento falhou no bloco %d: %s"):format(
-        i,
-        tostring(why)
-      )
+      return false,
+        ("Movimento falhou no bloco %d: %s"):format(
+          i,
+          tostring(why)
+        )
     end
 
     report("BUILDING", {
       plan_id = planId,
       action = "placing_block",
       target_block = p.block,
+
+      block_target = {
+        x = blockX,
+        y = blockY,
+        z = blockZ
+      },
+
       done = i - 1,
       total = total,
-      progress = math.floor(((i - 1) * 100) / math.max(total, 1))
+      progress = math.floor(
+        ((i - 1) * 100) / math.max(total, 1)
+      )
     })
 
-    local placed, perr = placeTarget(p.block, report)
+    local placed, perr = placeTarget(
+      p.block,
+      report
+    )
 
     if not placed then
       report("ERROR", {
@@ -201,18 +264,33 @@ function M.buildPlan(planId, reportFn)
       return false, perr
     end
 
-    local progress = math.floor((i * 100) / math.max(total, 1))
+    local progress = math.floor(
+      (i * 100) / math.max(total, 1)
+    )
 
     report("BUILDING", {
       plan_id = planId,
       action = "block_placed",
       block = p.block,
+
+      block_target = {
+        x = blockX,
+        y = blockY,
+        z = blockZ
+      },
+
       done = i,
       total = total,
       progress = progress
     })
 
-    print(("%d/%d (%d%%)"):format(i, total, progress))
+    print(
+      ("%d/%d (%d%%)"):format(
+        i,
+        total,
+        progress
+      )
+    )
   end
 
   report("IDLE", {
