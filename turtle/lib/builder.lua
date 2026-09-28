@@ -51,12 +51,10 @@ local function placeTarget(itemName)
   if exists and data and data.name == itemName then
     return true, "already"
   end
-
   if exists then
     local ok, why = turtle.digDown()
     if not ok then return false, "Nao consegui remover bloco existente: " .. tostring(why) end
   end
-
   waitForMaterial(itemName)
   if not turtle.placeDown() then
     return false, "Falha ao colocar " .. itemName
@@ -67,13 +65,11 @@ end
 function M.buildPlan(planId)
   local plan, err = apiGet("/api/plans/" .. textutils.urlEncode(planId))
   if not plan then return false, err end
-
   if not plan.origin or not plan.placements then
     return false, "Blueprint incompleto."
   end
 
   local ox, oy, oz = plan.origin.x, plan.origin.y, plan.origin.z
-
   table.sort(plan.placements, function(a, b)
     if a.y ~= b.y then return a.y < b.y end
     if a.z ~= b.z then return a.z < b.z end
@@ -86,19 +82,16 @@ function M.buildPlan(planId)
 
   for i, p in ipairs(plan.placements) do
     local tx, ty, tz = ox + p.x, oy + p.y + 1, oz + p.z
-
     local ok, why = nav.gotoXYZ(tx, ty, tz, {dig=false})
     if not ok then
       report("ERROR", { plan_id = planId, index = i, error = why })
       return false, ("Movimento falhou no bloco %d: %s"):format(i, tostring(why))
     end
-
     local placed, perr = placeTarget(p.block)
     if not placed then
       report("ERROR", { plan_id = planId, index = i, error = perr })
       return false, perr
     end
-
     if i % 10 == 0 or i == #plan.placements then
       report("BUILDING", {
         plan_id = planId,

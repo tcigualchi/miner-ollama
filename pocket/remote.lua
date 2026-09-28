@@ -1,5 +1,4 @@
 local cfg = require("config")
-
 peripheral.find("modem", function(name, modem)
   if modem.isWireless() then rednet.open(name) end
 end)
@@ -14,7 +13,6 @@ local function send(cmd)
     sleep(2)
     return
   end
-
   local sender, reply = rednet.receive(cfg.protocol, 2)
   if sender == cfg.controller_id and type(reply) == "table" and reply.type == "remote_reply" then
     print(reply.ok and "Comando encaminhado." or ("Falhou: " .. tostring(reply.message)))
@@ -27,37 +25,46 @@ end
 while true do
   term.clear()
   term.setCursorPos(1,1)
-  print("CC Fleet Pocket")
+  print("CC Fleet Pocket v2")
   print("Central #" .. cfg.controller_id)
   print("1 - Ping turtle")
   print("2 - Goto")
   print("3 - Build plan")
-  print("4 - Reboot turtle")
-  print("5 - Sair")
+  print("4 - Dig line")
+  print("5 - Quarry")
+  print("6 - Reboot turtle")
+  print("7 - Sair")
   write("> ")
   local c = read()
 
   if c == "1" then
     write("Turtle ID: ")
     send({command="ping", turtle_id=tonumber(read())})
-
   elseif c == "2" then
     write("Turtle ID: "); local id = tonumber(read())
     write("X: "); local x = tonumber(read())
     write("Y: "); local y = tonumber(read())
     write("Z: "); local z = tonumber(read())
     send({command="goto", turtle_id=id, x=x, y=y, z=z, dig=false})
-
   elseif c == "3" then
     write("Turtle ID: "); local id = tonumber(read())
     write("Plan ID: "); local pid = read()
     send({command="build", turtle_id=id, plan_id=pid})
-
   elseif c == "4" then
+    write("Turtle ID: "); local id = tonumber(read())
+    write("Comprimento: "); local len = tonumber(read())
+    write("Altura (padrao 2): "); local h = tonumber(read()) or 2
+    send({command="dig_line", turtle_id=id, length=len, height=h})
+  elseif c == "5" then
+    write("Turtle ID: "); local id = tonumber(read())
+    write("Largura: "); local w = tonumber(read())
+    write("Profundidade: "); local d = tonumber(read())
+    write("Altura (padrao 2): "); local h = tonumber(read()) or 2
+    send({command="quarry", turtle_id=id, width=w, depth=d, height=h})
+  elseif c == "6" then
     write("Turtle ID: ")
     send({command="reboot", turtle_id=tonumber(read())})
-
-  elseif c == "5" then
+  elseif c == "7" then
     return
   end
 end

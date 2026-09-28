@@ -1,4 +1,4 @@
 return {
-  controller_id = 0, -- ID do PC central
-  protocol = "ccfleet.v1"
+  controller_id = 0,
+  protocol = "ccfleet.v2"
 }

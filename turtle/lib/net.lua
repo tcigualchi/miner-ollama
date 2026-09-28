@@ -2,9 +2,7 @@ local M = {}
 
 function M.open()
   peripheral.find("modem", function(name, modem)
-    if modem.isWireless() then
-      rednet.open(name)
-    end
+    if modem.isWireless() then rednet.open(name) end
   end)
   if not rednet.isOpen() then
     error("Nenhum modem wireless encontrado/aberto.")
@@ -12,7 +10,7 @@ function M.open()
 end
 
 function M.send(id, msg, protocol)
-  if not id or id == 0 then return false end
+  if id == nil then return false end
   return rednet.send(id, msg, protocol)
 end
 

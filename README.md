@@ -1,36 +1,49 @@
-# CC Fleet AI
+# CC Fleet AI v2
 
-Sistema de frota para CC:Tweaked com:
+Versao ampliada com:
 
-- GPS
-- navegação de turtles
-- comunicação Rednet
-- PC central
-- Pocket Computer
-- servidor web
-- Ollama (`qwen3:4b`) para interpretar pedidos
-- geração determinística de blueprint
-- construção automática por camadas
+- site estilo pixel art
+- painel de frota em tempo quase real
+- status de todas as turtles
+- comandos de construcao com IA
+- goto
+- dig line
+- quarry
+- Pocket Computer atualizado
+- UTF-8 em todo o site para evitar caracteres quebrados
 
-## Arquitetura
+## O que mudou em relacao a v1
 
-Web -> FastAPI/Ollama -> fila -> PC Central -> Rednet -> Turtle -> GPS
+### Dashboard web
 
-A turtle busca o blueprint completo no servidor por HTTP usando o `plan_id`.
+O servidor agora recebe status do PC central e mostra:
 
-## 1. GPS
+- estado atual de cada turtle
+- posicao X/Y/Z
+- combustivel
+- extras (destino, plan_id, progresso, etc.)
+- fila de comandos pendentes
+- eventos recentes
 
-Use os quatro hosts GPS que você já configurou. Cada computador deve executar:
+### Novos comandos
 
-```lua
-shell.run("gps", "host", X, Y, Z)
-```
+- `goto`
+- `build`
+- `dig_line`
+- `quarry`
+- `reboot`
 
-com as coordenadas reais daquele computador.
+## Observacao importante sobre quarry
 
-## 2. Servidor Windows
+Nesta versao, o comando `quarry` limpa a area em serpentina no plano atual e abre altura configuravel.
+Ele e intencionalmente conservador para nao destruir sua propria base por acidente.
+Se quiser, a proxima iteracao pode virar uma quarry 3D completa por camadas com retorno automatico ao bau.
 
-Abra PowerShell na pasta `server`:
+## Instalação rápida
+
+### Servidor
+
+Na pasta `server`:
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -42,16 +55,10 @@ Edite `run.ps1` e troque:
 - `FLEET_TOKEN`
 - `WEB_PASSWORD`
 
-Depois:
+Rode:
 
 ```powershell
-.\run.ps1
-```
-
-Teste:
-
-```text
-http://127.0.0.1:8000/health
+.un.ps1
 ```
 
 Se for usar ngrok:
@@ -60,154 +67,67 @@ Se for usar ngrok:
 ngrok http 8000
 ```
 
-Copie a URL HTTPS do ngrok.
-
-## 3. PC central
-
-Copie os arquivos da pasta `central` para o Advanced Computer:
-
-- `/config.lua`
-- `/controller.lua`
-- `/startup.lua`
-
-Edite `config.lua`:
-
-- `server_url` = URL pública do servidor
-- `fleet_token` = exatamente o mesmo token do servidor
-
-Execute:
-
-```text
-reboot
-```
-
-Anote o ID mostrado pelo computador.
-
-## 4. Turtle
-
-Copie para a turtle:
-
-- `/config.lua`
-- `/worker.lua`
-- `/startup.lua`
-- `/lib/net.lua`
-- `/lib/nav.lua`
-- `/lib/inventory.lua`
-- `/lib/builder.lua`
-
-Edite `config.lua`:
-
-- `controller_id` = ID do PC central
-- `server_url` = mesma URL
-- `fleet_token` = mesmo token
-- `turtle_name` = nome único
-
-Depois:
-
-```text
-reboot
-```
-
-## 5. Pocket Computer
+### PC central
 
 Copie:
 
-- `/config.lua`
-- `/remote.lua`
-- `/startup.lua`
+- `central/config.lua`
+- `central/controller.lua`
+- `central/startup.lua`
 
-Configure `controller_id`, equipe um modem wireless e reinicie.
+Edite `config.lua` com:
 
-## 6. Construindo pelo navegador
+- URL do ngrok
+- mesmo token do servidor
 
-Abra a URL do servidor no navegador.
+### Turtle
 
-Informe:
+Copie tudo da pasta `turtle/` mantendo a pasta `lib/`.
 
-- senha do painel
-- ID do PC central
-- ID da turtle
-- X, Y, Z do canto de origem
-- descrição da casa
+Edite `turtle/config.lua`:
 
-Exemplo:
+- `controller_id` = ID do PC central
+- `server_url` = URL do ngrok
+- `fleet_token` = mesmo token
+- `turtle_name` = nome unico
 
-```text
-Casa medieval 13x11, dois andares, paredes de spruce, bastante vidro,
-porta na frente e telhado.
-```
+### Pocket
 
-O servidor:
+Copie `pocket/` e configure o ID do central.
 
-1. envia o texto ao Ollama;
-2. recebe parâmetros estruturados;
-3. limita materiais e dimensões;
-4. gera o blueprint;
-5. salva o plano;
-6. coloca um comando na fila;
-7. o PC central recebe;
-8. envia o `plan_id` à turtle;
-9. a turtle baixa o blueprint e constrói.
+## Exemplos de uso no site
 
-## Materiais
-
-A turtle precisa possuir os blocos físicos.
-
-Se acabar um material no meio da construção, ela entra em:
+### Construção com IA
 
 ```text
-WAITING_MATERIAL
+Casa medieval 13x11, dois andares, paredes de spruce, janelas grandes e telhado.
 ```
 
-e verifica o inventário a cada 2 segundos. Coloque o material e ela continua.
+### Goto
 
-O painel mostra a quantidade total prevista antes da construção.
+- Controller ID: 8
+- Turtle ID: 0
+- X/Y/Z desejados
 
-## Área de construção
+### Dig line
 
-A versão atual assume que o espaço onde a turtle viajará está livre.
+- comprimento: 20
+- altura: 2
 
-Ela NÃO quebra obstáculos durante a construção. Isso é proposital para evitar destruir a própria casa.
+### Quarry
 
-A coordenada de origem é o canto do piso da construção.
+- largura: 8
+- profundidade: 12
+- altura: 3
 
-## Segurança
-
-Não exponha o servidor com os valores padrão.
-
-Troque:
-
-- `FLEET_TOKEN`
-- `WEB_PASSWORD`
-
-O Rednet não oferece autenticação forte por si só. Em um servidor multiplayer não confiável,
-adicione autenticação/assinatura das mensagens antes de aceitar comandos de outros computadores.
-
-## Comandos do PC central
+## Comandos do central
 
 ```text
 list
-ping <turtle_id>
-goto <turtle_id> <x> <y> <z>
-build <turtle_id> <plan_id>
+ping <id>
+goto <id> <x> <y> <z>
+dig <id> <len> [altura]
+quarry <id> <w> <d> [altura]
+build <id> <plan_id>
+reboot <id>
 ```
-
-## Limitação atual
-
-A construção automática já funciona, mas esta primeira versão produz casas paramétricas
-retangulares. Ela entende estilo, tamanho, andares, materiais básicos, janelas, porta e telhado.
-
-A evolução natural é adicionar módulos determinísticos para:
-
-- quartos e divisórias
-- escadas
-- varanda
-- garagem
-- torres
-- castelos
-- casas em L
-- decoração
-- iluminação
-- mobília
-- múltiplas turtles dividindo setores
-- estação automática de reabastecimento
