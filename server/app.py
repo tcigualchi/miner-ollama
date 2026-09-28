@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import os
 import re
 import secrets
@@ -11,11 +10,9 @@ from typing import Any
 
 import requests
 from fastapi import FastAPI, Header, HTTPException, Request, Form, Response
-from fastapi.exception_handlers import request_validation_exception_handler
-from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
@@ -29,16 +26,6 @@ FLEET_TOKEN = os.getenv("FLEET_TOKEN", "CHANGE-ME")
 WEB_PASSWORD = os.getenv("WEB_PASSWORD", "CHANGE-ME")
 
 app = FastAPI(title="CC Fleet AI v2")
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_error(request: Request, exc: RequestValidationError):
-    if request.url.path == "/api/status":
-        fields = [{"field": ".".join(map(str, error["loc"])), "type": error["type"]} for error in exc.errors()]
-        logging.getLogger("uvicorn.error").warning("Status invalido: %s", fields)
-    return await request_validation_exception_handler(request, exc)
-
-
 templates = Jinja2Templates(directory=str(BASE / "templates"))
 commands: deque[dict[str, Any]] = deque()
 command_results: dict[str, dict[str, Any]] = {}
@@ -78,21 +65,15 @@ class StatusRequest(BaseModel):
     name: str | None = None
     label: str | None = None
     state: str | None = None
-    x: float | None = None
-    y: float | None = None
-    z: float | None = None
-    fuel: int | str | None = None
-    inventory: dict[str, int] = Field(default_factory=dict)
-    extra: dict[str, Any] = Field(default_factory=dict)
-    timestamp: int | None = None
-
-    @field_validator("inventory", "extra", mode="before")
-    @classmethod
-    def empty_lua_table(cls, value: Any) -> Any:
-        # ComputerCraft serializa tabelas Lua vazias como [] em alguns contextos.
-        if value == []:
-            return {}
-        return value
+    x: int | float | None = None
+    y: int | float | None = None
+    z: int | float | None = None
+    fuel: int | float | str | None = None
+    # CC:Tweaked pode serializar uma tabela Lua vazia como [] em vez de {}.
+    # Aceitamos Any aqui e normalizamos no endpoint.
+    inventory: Any = Field(default_factory=dict)
+    extra: Any = Field(default_factory=dict)
+    timestamp: int | float | None = None
 
 
 def require_fleet_token(x_fleet_token: str | None):
@@ -385,13 +366,68 @@ async def ack(command_id: str, request: Request, x_fleet_token: str | None = Hea
 
 
 @app.post("/api/status")
-def api_status(status: StatusRequest, x_fleet_token: str | None = Header(default=None)):
+async def api_status(
+    request: Request,
+    x_fleet_token: str | None = Header(default=None),
+):
     require_fleet_token(x_fleet_token)
-    key = f"{status.controller_id}:{status.turtle_id}"
-    payload = status.model_dump()
+
+    try:
+        raw = await request.json()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"JSON invalido: {e}")
+
+    if not isinstance(raw, dict):
+        raise HTTPException(status_code=400, detail="O status precisa ser um objeto JSON.")
+
+    def as_int(value, default=None):
+        if value is None:
+            return default
+        try:
+            return int(float(value))
+        except (TypeError, ValueError):
+            return default
+
+    def as_dict(value):
+        # O CC:Tweaked pode serializar uma tabela Lua vazia como [].
+        if value is None or value == []:
+            return {}
+        if isinstance(value, dict):
+            return value
+        return {"value": value}
+
+    controller_id = as_int(raw.get("controller_id"))
+    turtle_id = as_int(raw.get("turtle_id"))
+
+    if controller_id is None:
+        raise HTTPException(status_code=400, detail="controller_id ausente ou invalido")
+    if turtle_id is None:
+        raise HTTPException(status_code=400, detail="turtle_id ausente ou invalido")
+
+    payload = {
+        "controller_id": controller_id,
+        "turtle_id": turtle_id,
+        "name": str(raw.get("name") or f"turtle-{turtle_id}"),
+        "label": None if raw.get("label") is None else str(raw.get("label")),
+        "state": str(raw.get("state") or "UNKNOWN"),
+        "x": as_int(raw.get("x")),
+        "y": as_int(raw.get("y")),
+        "z": as_int(raw.get("z")),
+        "fuel": raw.get("fuel"),
+        "inventory": as_dict(raw.get("inventory")),
+        "extra": as_dict(raw.get("extra")),
+        "timestamp": as_int(raw.get("timestamp")),
+    }
+
+    key = f"{controller_id}:{turtle_id}"
     fleet_status[key] = payload
     push_event("status", payload)
-    return {"ok": True}
+
+    return {
+        "ok": True,
+        "controller_id": controller_id,
+        "turtle_id": turtle_id,
+    }
 
 
 @app.get("/api/fleet")
