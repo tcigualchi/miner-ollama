@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MINER//CONTROL</title>
+  <style>
+    :root{--bg:#10161a;--panel:#1b2829;--edge:#50634b;--green:#adf078;--muted:#91a897;--gold:#f4ca72;--red:#ff8c82}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#e4f2dc;font:16px/1.5 monospace;background-image:linear-gradient(#1e2b2a 1px,transparent 1px),linear-gradient(90deg,#1e2b2a 1px,transparent 1px);background-size:32px 32px}
+    header,main,footer{max-width:1120px;margin:auto;padding:24px}header{padding-top:52px;display:flex;justify-content:space-between;align-items:end;gap:18px}
+    h1,h2,p{margin:0}h1{font-size:clamp(28px,5vw,54px);color:var(--green);line-height:1.1;letter-spacing:-3px;text-shadow:4px 4px #304b38}h2{color:var(--green);font-size:17px;letter-spacing:2px;margin-bottom:20px}small,.muted{color:var(--muted)}.eyebrow{color:var(--gold);letter-spacing:3px;margin-bottom:10px}.badge{padding:8px 12px;background:#243327;border:2px solid var(--edge);white-space:nowrap;color:var(--gold)}
+    .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.box{background:var(--panel);border:3px solid var(--edge);box-shadow:6px 6px 0 #0a0e10;padding:24px;margin-bottom:18px;min-width:0}.hero{min-height:238px;display:flex;align-items:center;justify-content:space-between;gap:20px}.turtle{font-size:90px;line-height:1;filter:drop-shadow(7px 7px #0c1513);transform:scaleX(-1)}.status{font-size:23px;color:var(--gold);overflow-wrap:anywhere}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}.stat{background:#14201f;padding:12px;border:1px solid #425843}.stat strong{font-size:23px;display:block;color:white}.bar{height:18px;background:#101a19;border:2px solid #425843;margin-top:18px}.fill{height:100%;width:0;background:repeating-linear-gradient(90deg,var(--green) 0 16px,#86cb61 16px 20px);transition:width .4s}
+    .compass{display:grid;place-items:center;min-height:155px;font-size:85px;color:var(--green);text-shadow:5px 5px #273e35}.coords{text-align:center;color:var(--gold);font-size:19px}.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.slot{min-height:76px;background:#14201f;border:2px solid #3d5848;padding:7px;overflow:hidden}.slot.empty{opacity:.45}.slot small{display:block;color:var(--gold)}.slot span{display:block;overflow-wrap:anywhere;font-size:13px}.slot b{float:right;color:var(--green)}.loot{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.loot div{padding:10px;border-left:4px solid var(--gold);background:#14201f;overflow-wrap:anywhere}.loot b{color:var(--green);float:right;margin-left:5px}canvas.turtle{width:128px;height:128px;image-rendering:pixelated;flex:none}footer{color:var(--muted);padding-bottom:45px}@media(max-width:740px){header{display:block}.badge{display:inline-block;margin-top:18px}.grid{grid-template-columns:1}.hero{min-height:190px}canvas.turtle{width:64px;height:64px}.stats{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <header><div><div class="eyebrow">◈ CC:TWEAKED / OLLAMA</div><h1>MINER//CONTROL</h1><p class="muted">Painel de expedição da Mining Turtle</p></div><span class="badge" id="connection">● AGUARDANDO</span></header>
+  <main>
+    <div class="grid">
+      <div>
+        <section class="box hero"><div><h2>ESTADO DA MISSÃO</h2><p class="status" id="status">Aguardando turtle</p><div class="stats"><div class="stat">COMBUSTÍVEL<strong id="fuel">—</strong></div><div class="stat">PROGRESSO<strong id="progress">0 / 0</strong></div><div class="stat">ITENS<strong id="items">0</strong></div></div><div class="bar"><div class="fill" id="bar"></div></div></div><canvas class="turtle" width="16" height="16" aria-label="Turtle em pixel art"></canvas></section>
+        <section class="box"><h2>INVENTÁRIO / 16 SLOTS</h2><div class="slots" id="slots"></div></section>
+      </div>
+      <div>
+        <section class="box"><h2>DIREÇÃO ATUAL</h2><div class="compass" id="compass">↑</div><div class="coords" id="heading">NORTE*</div><p class="muted" style="text-align:center;margin-top:9px">* Norte relativo ao início do programa</p></section>
+        <section class="box"><h2>POSIÇÃO RELATIVA</h2><p class="coords" id="coords">X 0 · Y 0 · Z 0</p></section>
+        <section class="box"><h2>ITENS COLETADOS NESTA SESSÃO</h2><div class="loot" id="loot"><small>Nenhum item registrado.</small></div></section>
+      </div>
+    </div>
+  </main>
+  <footer>Atualização automática a cada 2 segundos · Disponível apenas neste computador</footer>
+  <script>
+    const $=id=>document.getElementById(id), dirs={norte:"↑",leste:"→",sul:"↓",oeste:"←"};
+    const sprite=["................",".....DDDDDD.....","...DDGGGGGGDD...","..DGGGGGGGGGGD..",".DGGLGGGGGGLGGD.",".DGGLGGGGGGLGGD.","DGGGGGGGGGGGGGGD","DGGLGGDDGGGGLGGD","DGGLGGDDGGGGLGGD","DGGGGGGGGGGGGGGD",".DGGLGGGGGGLGGD.",".DGGLGGGGGGLGGD.","..DGGGGGGGGGGD..","...DDGGGGGGDD...",".....DDDDDD.....","................"];
+    const ctx=document.querySelector("canvas.turtle").getContext("2d"),palette={D:"#314d31",G:"#79ad59",L:"#b6db70"};
+    sprite.forEach((row,y)=>[...row].forEach((c,x)=>{if(palette[c]){ctx.fillStyle=palette[c];ctx.fillRect(x,y,1,1)}}));
+    const label=name=>String(name||"").replace(/^minecraft:/,"").replaceAll("_"," ");
+    function update(s){
+      $("connection").textContent=s.online?"● CONECTADA":"● AGUARDANDO";
+      $("status").textContent=s.status||"Aguardando";
+      $("fuel").textContent=s.fuel===undefined?"—":s.fuel;
+      $("progress").textContent=(s.progress||0)+" / "+(s.total||0);
+      $("bar").style.width=(s.total?Math.min(100,100*s.progress/s.total):0)+"%";
+      $("compass").textContent=dirs[s.heading]||"↑";
+      $("heading").textContent=String(s.heading||"norte").toUpperCase()+"*";
+      const p=s.position||{};$("coords").textContent="X "+(p.x||0)+" · Y "+(p.y||0)+" · Z "+(p.z||0);
+      const inv=Array.isArray(s.inventory)?s.inventory:[];
+      $("items").textContent=inv.reduce((a,i)=>a+(Number(i.count)||0),0);
+      const slots=new Map(inv.map(i=>[Number(i.slot),i]));
+      $("slots").replaceChildren(...Array.from({length:16},(_,index)=>{
+        const i=slots.get(index+1),el=document.createElement("div");
+        el.className="slot"+(i?"":" empty");
+        const small=document.createElement("small");small.textContent="SLOT "+String(index+1).padStart(2,"0");
+        const span=document.createElement("span");span.textContent=i?label(i.name):"vazio";
+        const count=document.createElement("b");count.textContent=i?"×"+i.count:"";
+        el.append(small,count,span);return el;
+      }));
+      const loot=s.collected||{}, entries=Object.entries(loot).filter(([_,n])=>n>0);
+      if(entries.length){$("loot").replaceChildren(...entries.map(([name,n])=>{
+        const row=document.createElement("div"),count=document.createElement("b");
+        count.textContent="×"+n;row.textContent=label(name);row.append(count);return row;
+      }));}else $("loot").textContent="Nenhum item registrado.";
+    }
+    async function poll(){try{const r=await fetch("/api/state",{cache:"no-store"});if(!r.ok)throw Error();update(await r.json())}
+      catch{$("connection").textContent="● SEM CONEXÃO";}}
+    poll();setInterval(poll,2000);
+  </script>
+</body></html>

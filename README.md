@@ -1,34 +1,49 @@
-# CC: Tweaked + Ollama: minerador por texto
+# Minerador com IA + painel pixel art
 
-Primeira versao: a Mining Turtle escava um tunel reto de 2 blocos de altura por ate 64 blocos. Ela consulta o Ollama por meio de um servidor Python, pede confirmacao, verifica combustivel e inventario, para ao detectar agua/lava e tenta voltar ao inicio. O modelo apenas escolhe uma tarefa e um comprimento; ele nao executa codigo Lua.
+Mining Turtle (CC: Tweaked) + Ollama local + servidor Python. O modelo converte texto em um plano limitado; a turtle valida o plano e pede confirmacao antes de qualquer movimento.
 
-## No computador com Ollama
+## O que faz
 
-1. Instale o Ollama, inicie o servico e baixe um modelo: `ollama pull qwen3:4b`.
-2. Em um terminal Linux/macOS:
-   ```sh
-   export MINER_TOKEN='escolha-uma-senha-longa-aleatoria'
-   export OLLAMA_MODEL='qwen3:4b'
-   python3 server.py
-   ```
-   No PowerShell, use `$env:MINER_TOKEN='escolha-uma-senha-longa-aleatoria'` e `$env:OLLAMA_MODEL='qwen3:4b'`, depois `python server.py`.
-3. Em outro terminal, publique somente o servidor Python: `ngrok http 8765`. Copie a URL HTTPS gerada.
+- Abre tunel horizontal de 2 blocos de altura para **frente, direita, esquerda ou tras** (direcoes relativas a orientacao atual).
+- Busca um **bloco especifico** por ate 64 blocos, inspecionando frente, acima e abaixo do corredor. Exemplo: `procure minerio de diamante por 12 blocos a esquerda`. O nome precisa ser um ID de bloco Minecraft, como `minecraft:diamond_ore`.
+- Volta ao ponto de partida quando o caminho permite; mantem a nova orientacao. Detecta liquidos, inventario cheio e combustivel insuficiente.
+- Exibe painel pixel art em `http://127.0.0.1:8766`: slots, itens coletados nesta sessao, combustivel, progresso, direcao e posicao relativa.
 
-O servidor Python pede ao Ollama uma resposta sem modo de raciocinio e mantem o modelo carregado por 15 minutos. O servidor Python se conecta ao Ollama localmente. Nao publique a porta 11434 do Ollama.
+**Na busca especifica, a turtle nao quebra outros blocos para chegar ao alvo.** Se pedra ou outro bloco bloquear a frente, ela para e volta. Para abrir caminho atraves de pedra, use primeiro o modo tunel. O modo de busca nao procura cavernas ou veios fora da linha percorrida. A orientacao inicial e chamada de norte, sem GPS; reiniciar o programa redefine a posicao relativa.
+
+## Iniciar no Windows (PowerShell)
+
+Deixe `server.py` e `dashboard.html` na **mesma pasta**.
+
+```powershell
+ollama pull qwen3:4b
+$env:MINER_TOKEN = 'ESCOLHA-UM-TOKEN-LONGO-E-NOVO'
+$env:OLLAMA_MODEL = 'qwen3:4b'
+python server.py
+```
+
+Em outro terminal:
+
+```powershell
+ngrok http 8765
+```
+
+Abra o painel **somente no computador com o Python** em `http://127.0.0.1:8766`. O ngrok publica apenas a API na porta 8765; a porta 8766 fica restrita a localhost. O Ollama tambem permanece local. Se o ngrok reiniciar, atualize sua URL na turtle. Como um token curto anterior foi exposto, escolha um novo token e nao publique seu valor no GitHub.
 
 ## Na Mining Turtle
 
-1. Coloque `miner.lua` no computador da turtle (por exemplo, publique o arquivo em seu GitHub e use `wget run https://raw.githubusercontent.com/USUARIO/REPO/main/miner.lua` depois de configurar as duas primeiras linhas).
-2. Edite `SERVER` com a URL HTTPS do ngrok e `TOKEN` com o mesmo valor de `MINER_TOKEN`.
-3. Abasteca a turtle, deixe-a apontada para o local desejado e execute `miner`.
-4. Digite `abra um tunel de 12 blocos` e confirme com `sim`.
+Coloque `miner.lua` na turtle. Edite `SERVER` para a URL HTTPS exata mostrada pelo ngrok e `TOKEN` para o valor de `MINER_TOKEN`. O endereco nao deve terminar em `/plan`. Abasteca a turtle e rode `miner`.
 
-O endereco gratuito do ngrok pode mudar entre inicializacoes. Atualize `SERVER` quando isso ocorrer. Para interromper manualmente, use Ctrl+T no computador da turtle; neste caso ela pode parar longe da origem. Durante o retorno, obstaculos colocados no caminho tambem podem impedi-la de voltar.
+Exemplos de pedidos:
+
+```text
+abra um tunel de 5 blocos a direita
+abra um tunel de 3 blocos para tras
+procure minecraft:diamond_ore por 12 blocos a esquerda
+```
+
+Confirme com `sim`. Digite `sair` para encerrar. O timeout HTTP do CC: Tweaked e de no maximo 60 segundos. Se o Ollama levar mais que isso, a consulta falha; aqueça o modelo localmente antes de tentar novamente. Se usar Ctrl+T durante a escavacao, a turtle pode parar longe do ponto inicial.
 
 ## Limites
 
-Nao remove obstaculos no retorno e nao deposita itens em bau. Para escavacao extensa, exploracao de minerios, GPS, recarga e retomada apos reinicio, essas funcoes precisam de uma proxima etapa.
-
-## Se aparecer connection timed out
-
-A turtle espera ate 150 segundos pela resposta. Verifique no terminal do Python se o POST /plan terminou em 200 ou 502, execute `ollama list` e teste `ollama run qwen3:4b "retorne apenas oi"` no Windows. Confirme que o ngrok aponta para a mesma porta configurada em PORT.
+Nao aceita instrucoes livres de Lua, escavacao vertical ou deposito automatico em baus. Os itens coletados sao calculados pela diferenca positiva no inventario entre etapas: movimentacao manual e reinicios podem afetar a contagem. O painel depende de o programa `miner` estar aberto; a API guarda apenas o ultimo estado em memoria, sem persistencia apos reiniciar o Python.
