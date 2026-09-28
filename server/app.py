@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import secrets
@@ -10,9 +11,11 @@ from typing import Any
 
 import requests
 from fastapi import FastAPI, Header, HTTPException, Request, Form, Response
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
@@ -26,6 +29,16 @@ FLEET_TOKEN = os.getenv("FLEET_TOKEN", "CHANGE-ME")
 WEB_PASSWORD = os.getenv("WEB_PASSWORD", "CHANGE-ME")
 
 app = FastAPI(title="CC Fleet AI v2")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(request: Request, exc: RequestValidationError):
+    if request.url.path == "/api/status":
+        fields = [{"field": ".".join(map(str, error["loc"])), "type": error["type"]} for error in exc.errors()]
+        logging.getLogger("uvicorn.error").warning("Status invalido: %s", fields)
+    return await request_validation_exception_handler(request, exc)
+
+
 templates = Jinja2Templates(directory=str(BASE / "templates"))
 commands: deque[dict[str, Any]] = deque()
 command_results: dict[str, dict[str, Any]] = {}
@@ -65,13 +78,21 @@ class StatusRequest(BaseModel):
     name: str | None = None
     label: str | None = None
     state: str | None = None
-    x: int | None = None
-    y: int | None = None
-    z: int | None = None
+    x: float | None = None
+    y: float | None = None
+    z: float | None = None
     fuel: int | str | None = None
     inventory: dict[str, int] = Field(default_factory=dict)
     extra: dict[str, Any] = Field(default_factory=dict)
     timestamp: int | None = None
+
+    @field_validator("inventory", "extra", mode="before")
+    @classmethod
+    def empty_lua_table(cls, value: Any) -> Any:
+        # ComputerCraft serializa tabelas Lua vazias como [] em alguns contextos.
+        if value == []:
+            return {}
+        return value
 
 
 def require_fleet_token(x_fleet_token: str | None):

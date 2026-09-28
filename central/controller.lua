@@ -35,6 +35,11 @@ local function apiRequest(url, method, body)
 end
 
 local function postStatus(turtleId, msg)
+  -- textutils pode codificar uma tabela Lua vazia como [] em vez de {}.
+  local inventory = msg.inventory or {}
+  local extra = msg.extra or {}
+  if next(inventory) == nil then inventory = textutils.empty_json_object end
+  if next(extra) == nil then extra = textutils.empty_json_object end
   local body = textutils.serializeJSON({
     controller_id = os.getComputerID(),
     turtle_id = turtleId,
@@ -43,11 +48,12 @@ local function postStatus(turtleId, msg)
     state = msg.state,
     x = msg.x, y = msg.y, z = msg.z,
     fuel = msg.fuel,
-    inventory = msg.inventory or {},
-    extra = msg.extra or {},
+    inventory = inventory,
+    extra = extra,
     timestamp = msg.timestamp or os.epoch("utc")
   })
-  apiRequest(cfg.server_url .. "/api/status", "POST", body)
+  local _, err = apiRequest(cfg.server_url .. "/api/status", "POST", body)
+  if err then print("Falha ao enviar status: " .. tostring(err)) end
 end
 
 local function forwardCommand(cmd)
