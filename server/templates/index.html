@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CC Fleet AI</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 18px; background:#111; color:#eee; }
+    input, textarea, button { width:100%; box-sizing:border-box; padding:10px; margin:6px 0 14px; background:#1d1d1d; color:#fff; border:1px solid #444; border-radius:8px; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    button { cursor:pointer; font-weight:700; }
+    pre { white-space:pre-wrap; background:#1b1b1b; padding:14px; border-radius:8px; }
+    .ok { border-left:4px solid #4caf50; padding-left:12px; }
+    .err { border-left:4px solid #f44336; padding-left:12px; }
+  </style>
+</head>
+<body>
+  <h1>CC Fleet AI</h1>
+  <p>Descreva a casa. A IA converte o pedido em especificação e o gerador cria o blueprint.</p>
+
+  <form method="post" action="/web/build">
+    <label>Senha do painel</label>
+    <input type="password" name="password" required>
+
+    <div class="grid">
+      <div><label>Controller ID</label><input type="number" name="controller_id" required></div>
+      <div><label>Turtle ID</label><input type="number" name="turtle_id" required></div>
+      <div></div>
+    </div>
+
+    <label>Origem da construção (canto do piso)</label>
+    <div class="grid">
+      <input type="number" name="x" placeholder="X" required>
+      <input type="number" name="y" placeholder="Y" required>
+      <input type="number" name="z" placeholder="Z" required>
+    </div>
+
+    <label>Pedido para a IA</label>
+    <textarea name="prompt" rows="6" required placeholder="Ex.: Casa medieval 13x11, dois andares, madeira escura, janelas, porta central e telhado."></textarea>
+
+    <button type="submit">Criar plano e mandar construir</button>
+  </form>
+
+  {% if error %}
+    <div class="err"><h3>Erro</h3><pre>{{ error }}</pre></div>
+  {% endif %}
+
+  {% if result %}
+    <div class="ok">
+      <h3>Comando criado</h3>
+      <p>Plan ID: <b>{{ result.plan_id }}</b> — Turtle #{{ result.turtle_id }} — {{ result.blocks }} blocos.</p>
+      <h4>Especificação</h4>
+      <pre>{{ result.spec | tojson(indent=2) }}</pre>
+      <h4>Materiais necessários</h4>
+      <pre>{{ result.materials | tojson(indent=2) }}</pre>
+      <p>Se faltar material, a turtle ficará parada esperando você abastecer o inventário.</p>
+    </div>
+  {% endif %}
+</body>
+</html>

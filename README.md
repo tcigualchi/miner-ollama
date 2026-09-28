@@ -1,49 +1,213 @@
-# Minerador com IA + painel pixel art
+# CC Fleet AI
 
-Mining Turtle (CC: Tweaked) + Ollama local + servidor Python. O modelo converte texto em um plano limitado; a turtle valida o plano e pede confirmacao antes de qualquer movimento.
+Sistema de frota para CC:Tweaked com:
 
-## O que faz
+- GPS
+- navegação de turtles
+- comunicação Rednet
+- PC central
+- Pocket Computer
+- servidor web
+- Ollama (`qwen3:4b`) para interpretar pedidos
+- geração determinística de blueprint
+- construção automática por camadas
 
-- Abre tunel horizontal de 2 blocos de altura para **frente, direita, esquerda ou tras** (direcoes relativas a orientacao atual).
-- Busca um **bloco especifico** por ate 64 blocos, inspecionando frente, acima e abaixo do corredor. Exemplo: `procure minerio de diamante por 12 blocos a esquerda`. O nome precisa ser um ID de bloco Minecraft, como `minecraft:diamond_ore`.
-- Volta ao ponto de partida quando o caminho permite; mantem a nova orientacao. Detecta liquidos, inventario cheio e combustivel insuficiente.
-- Exibe painel pixel art em `http://127.0.0.1:8766`: slots, itens coletados nesta sessao, combustivel, progresso, direcao e posicao relativa.
+## Arquitetura
 
-**Na busca especifica, a turtle nao quebra outros blocos para chegar ao alvo.** Se pedra ou outro bloco bloquear a frente, ela para e volta. Para abrir caminho atraves de pedra, use primeiro o modo tunel. O modo de busca nao procura cavernas ou veios fora da linha percorrida. A orientacao inicial e chamada de norte, sem GPS; reiniciar o programa redefine a posicao relativa.
+Web -> FastAPI/Ollama -> fila -> PC Central -> Rednet -> Turtle -> GPS
 
-## Iniciar no Windows (PowerShell)
+A turtle busca o blueprint completo no servidor por HTTP usando o `plan_id`.
 
-Deixe `server.py` e `dashboard.html` na **mesma pasta**.
+## 1. GPS
+
+Use os quatro hosts GPS que você já configurou. Cada computador deve executar:
+
+```lua
+shell.run("gps", "host", X, Y, Z)
+```
+
+com as coordenadas reais daquele computador.
+
+## 2. Servidor Windows
+
+Abra PowerShell na pasta `server`:
 
 ```powershell
+python -m pip install -r requirements.txt
 ollama pull qwen3:4b
-$env:MINER_TOKEN = 'ESCOLHA-UM-TOKEN-LONGO-E-NOVO'
-$env:OLLAMA_MODEL = 'qwen3:4b'
-python server.py
 ```
 
-Em outro terminal:
+Edite `run.ps1` e troque:
+
+- `FLEET_TOKEN`
+- `WEB_PASSWORD`
+
+Depois:
 
 ```powershell
-ngrok http 8765
+.\run.ps1
 ```
 
-Abra o painel **somente no computador com o Python** em `http://127.0.0.1:8766`. O ngrok publica apenas a API na porta 8765; a porta 8766 fica restrita a localhost. O Ollama tambem permanece local. Se o ngrok reiniciar, atualize sua URL na turtle. Como um token curto anterior foi exposto, escolha um novo token e nao publique seu valor no GitHub.
-
-## Na Mining Turtle
-
-Coloque `miner.lua` na turtle. Edite `SERVER` para a URL HTTPS exata mostrada pelo ngrok e `TOKEN` para o valor de `MINER_TOKEN`. O endereco nao deve terminar em `/plan`. Abasteca a turtle e rode `miner`.
-
-Exemplos de pedidos:
+Teste:
 
 ```text
-abra um tunel de 5 blocos a direita
-abra um tunel de 3 blocos para tras
-procure minecraft:diamond_ore por 12 blocos a esquerda
+http://127.0.0.1:8000/health
 ```
 
-Confirme com `sim`. Digite `sair` para encerrar. O timeout HTTP do CC: Tweaked e de no maximo 60 segundos. Se o Ollama levar mais que isso, a consulta falha; aqueça o modelo localmente antes de tentar novamente. Se usar Ctrl+T durante a escavacao, a turtle pode parar longe do ponto inicial.
+Se for usar ngrok:
 
-## Limites
+```powershell
+ngrok http 8000
+```
 
-Nao aceita instrucoes livres de Lua, escavacao vertical ou deposito automatico em baus. Os itens coletados sao calculados pela diferenca positiva no inventario entre etapas: movimentacao manual e reinicios podem afetar a contagem. O painel depende de o programa `miner` estar aberto; a API guarda apenas o ultimo estado em memoria, sem persistencia apos reiniciar o Python.
+Copie a URL HTTPS do ngrok.
+
+## 3. PC central
+
+Copie os arquivos da pasta `central` para o Advanced Computer:
+
+- `/config.lua`
+- `/controller.lua`
+- `/startup.lua`
+
+Edite `config.lua`:
+
+- `server_url` = URL pública do servidor
+- `fleet_token` = exatamente o mesmo token do servidor
+
+Execute:
+
+```text
+reboot
+```
+
+Anote o ID mostrado pelo computador.
+
+## 4. Turtle
+
+Copie para a turtle:
+
+- `/config.lua`
+- `/worker.lua`
+- `/startup.lua`
+- `/lib/net.lua`
+- `/lib/nav.lua`
+- `/lib/inventory.lua`
+- `/lib/builder.lua`
+
+Edite `config.lua`:
+
+- `controller_id` = ID do PC central
+- `server_url` = mesma URL
+- `fleet_token` = mesmo token
+- `turtle_name` = nome único
+
+Depois:
+
+```text
+reboot
+```
+
+## 5. Pocket Computer
+
+Copie:
+
+- `/config.lua`
+- `/remote.lua`
+- `/startup.lua`
+
+Configure `controller_id`, equipe um modem wireless e reinicie.
+
+## 6. Construindo pelo navegador
+
+Abra a URL do servidor no navegador.
+
+Informe:
+
+- senha do painel
+- ID do PC central
+- ID da turtle
+- X, Y, Z do canto de origem
+- descrição da casa
+
+Exemplo:
+
+```text
+Casa medieval 13x11, dois andares, paredes de spruce, bastante vidro,
+porta na frente e telhado.
+```
+
+O servidor:
+
+1. envia o texto ao Ollama;
+2. recebe parâmetros estruturados;
+3. limita materiais e dimensões;
+4. gera o blueprint;
+5. salva o plano;
+6. coloca um comando na fila;
+7. o PC central recebe;
+8. envia o `plan_id` à turtle;
+9. a turtle baixa o blueprint e constrói.
+
+## Materiais
+
+A turtle precisa possuir os blocos físicos.
+
+Se acabar um material no meio da construção, ela entra em:
+
+```text
+WAITING_MATERIAL
+```
+
+e verifica o inventário a cada 2 segundos. Coloque o material e ela continua.
+
+O painel mostra a quantidade total prevista antes da construção.
+
+## Área de construção
+
+A versão atual assume que o espaço onde a turtle viajará está livre.
+
+Ela NÃO quebra obstáculos durante a construção. Isso é proposital para evitar destruir a própria casa.
+
+A coordenada de origem é o canto do piso da construção.
+
+## Segurança
+
+Não exponha o servidor com os valores padrão.
+
+Troque:
+
+- `FLEET_TOKEN`
+- `WEB_PASSWORD`
+
+O Rednet não oferece autenticação forte por si só. Em um servidor multiplayer não confiável,
+adicione autenticação/assinatura das mensagens antes de aceitar comandos de outros computadores.
+
+## Comandos do PC central
+
+```text
+list
+ping <turtle_id>
+goto <turtle_id> <x> <y> <z>
+build <turtle_id> <plan_id>
+```
+
+## Limitação atual
+
+A construção automática já funciona, mas esta primeira versão produz casas paramétricas
+retangulares. Ela entende estilo, tamanho, andares, materiais básicos, janelas, porta e telhado.
+
+A evolução natural é adicionar módulos determinísticos para:
+
+- quartos e divisórias
+- escadas
+- varanda
+- garagem
+- torres
+- castelos
+- casas em L
+- decoração
+- iluminação
+- mobília
+- múltiplas turtles dividindo setores
+- estação automática de reabastecimento
