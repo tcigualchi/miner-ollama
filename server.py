@@ -19,12 +19,15 @@ LOCK = threading.Lock()
 SCHEMA = {
     "type": "object",
     "properties": {
-        "task": {"type": "string", "enum": ["tunnel", "mine_target", "place", "unsupported"]},
+        "task": {"type": "string", "enum": ["tunnel", "mine_target", "place", "area", "unsupported"]},
         "direction": {"type": "string", "enum": ["frente", "tras", "direita", "esquerda", "cima", "baixo"]},
         "length": {"type": "integer", "minimum": 0, "maximum": 4096},
         "block": {"type": "string"},
+        "width": {"type": "integer", "minimum": 0, "maximum": 256},
+        "height": {"type": "integer", "minimum": 0, "maximum": 256},
+        "depth": {"type": "integer", "minimum": 0, "maximum": 64},
     },
-    "required": ["task", "direction", "length", "block"],
+    "required": ["task", "direction", "length", "block", "width", "height", "depth"],
     "additionalProperties": False,
 }
 
@@ -90,6 +93,11 @@ class Handler(BaseHTTPRequestHandler):
                     "block deve ser id exato Minecraft, como minecraft:diamond_ore. "
                     "place coloca UM bloco do inventario adjacente, com length=1 e block="
                     "id Minecraft exato do item, por exemplo minecraft:cobblestone. "
+                    "area cava um buraco retangular: primeiro contorno, depois interior em faixas. "
+                    "width e largura para a direita, height e comprimento para frente, depth e "
+                    "profundidade para baixo (se nao indicada, use 1). Para area use length=0, "
+                    "direction=frente, block vazio. Dimensoes width/height 1..256, depth 1..64. "
+                    "Para as outras tarefas use width=0, height=0, depth=0. "
                     "direction relativa a frente atual: frente, tras, direita, esquerda, cima, baixo. "
                     "Sem direcao, use frente. tunnel usa block vazio. "
                     "Sem comprimento para tunnel/mine_target use unsupported com length=0, "
@@ -101,6 +109,9 @@ class Handler(BaseHTTPRequestHandler):
                     '"block":"minecraft:diamond_ore"}. '
                     "Exemplo: coloque pedra abaixo => "
                     '{"task":"place","direction":"baixo","length":1,"block":"minecraft:cobblestone"}. '
+                    "Exemplo: cave um buraco 8x8 com 2 blocos de profundidade => "
+                    '{"task":"area","direction":"frente","length":0,"block":"",'
+                    '"width":8,"height":8,"depth":2}. '
                     "Pedido: " + prompt),
             }
             request = urllib.request.Request(
@@ -109,10 +120,16 @@ class Handler(BaseHTTPRequestHandler):
             with urllib.request.urlopen(request, timeout=55) as response:
                 raw = json.load(response)["response"]
             plan = json.loads(raw)
-            if not isinstance(plan, dict) or plan.get("task") not in ("tunnel", "mine_target", "place", "unsupported"):
+            if not isinstance(plan, dict) or plan.get("task") not in ("tunnel", "mine_target", "place", "area", "unsupported"):
                 return self.reply(422, {"error": "Plano invalido: " + str(raw)[:150]})
             if plan["task"] == "unsupported":
                 return self.reply(200, {"task": "unsupported", "direction": "frente", "length": 0, "block": ""})
+            if plan["task"] == "area":
+                width, height, depth = plan.get("width"), plan.get("height"), plan.get("depth")
+                if (type(width) is not int or type(height) is not int or type(depth) is not int
+                        or not 1 <= width <= 256 or not 1 <= height <= 256 or not 1 <= depth <= 64):
+                    return self.reply(422, {"error": "Dimensoes invalidas: " + str(raw)[:150]})
+                return self.reply(200, {"task": "area", "width": width, "height": height, "depth": depth})
             direction, length, block = plan.get("direction"), plan.get("length"), plan.get("block")
             if direction not in ("frente", "tras", "direita", "esquerda", "cima", "baixo") or type(length) is not int or not 1 <= length <= 4096:
                 return self.reply(422, {"error": "Direcao/comprimento invalidos: " + str(raw)[:150]})

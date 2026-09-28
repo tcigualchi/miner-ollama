@@ -85,6 +85,8 @@ local function refuelFromInventory()
 end
 
 local function ensureFuel(needed)
+  local limit = turtle.getFuelLimit()
+  if type(limit) == "number" and needed > limit then return false end
   while type(turtle.getFuelLevel()) == "number" and turtle.getFuelLevel() < needed do
     refuelFromInventory()
     if turtle.getFuelLevel() >= needed then break end
@@ -95,6 +97,7 @@ local function ensureFuel(needed)
     write("Depois pressione Enter para continuar: ")
     read()
   end
+  return true
 end
 
 local function turnLeft()
@@ -248,6 +251,159 @@ local function execute(plan)
   report()
 end
 
+local function executeArea(plan)
+  local width, height, depth = plan.width, plan.height, plan.depth
+  local area = width * height
+  local originalHeading = heading
+  local trail = {}
+  local column, row = 0, 0
+  total, progress = area, 0
+  -- Estimativa conservadora: superficie, volta e descida/subida em cada celula.
+  estimate = 2 * depth * area + 2 * (width + height)
+  status = "Area " .. width .. "x" .. height .. " profundidade " .. depth
+  print(status .. " | estimativa de combustivel: " .. estimate)
+  report()
+
+  local function faceHeading(target)
+    for i = 1, 3 do
+      if heading == target then return true end
+      if not turnRight() then return false end
+    end
+    return heading == target
+  end
+  local function walk(deltaColumn, deltaRow)
+    local target
+    if deltaColumn == 1 then target = (originalHeading + 1) % 4
+    elseif deltaColumn == -1 then target = (originalHeading + 3) % 4
+    elseif deltaRow == 1 then target = originalHeading
+    else target = (originalHeading + 2) % 4 end
+    if not faceHeading(target) then return false, "Falha ao girar" end
+    if not ensureFuel(#trail + 1) then
+      return false, "Limite de combustivel para voltar desta distancia"
+    end
+    local ok, err = advance()
+    if not ok then return false, "Caminho bloqueado: " .. tostring(err) end
+    trail[#trail + 1] = target
+    column, row = column + deltaColumn, row + deltaRow
+    return true
+  end
+  local function reach(targetColumn, targetRow)
+    while column ~= targetColumn do
+      local step = targetColumn > column and 1 or -1
+      local ok, err = walk(step, 0)
+      if not ok then return false, err end
+    end
+    while row ~= targetRow do
+      local step = targetRow > row and 1 or -1
+      local ok, err = walk(0, step)
+      if not ok then return false, err end
+    end
+    return true
+  end
+  local function digColumn()
+    local descent, reason = 0, nil
+    if not ensureFuel(#trail + 2 * (depth - 1)) then
+      return false, "Limite de combustivel para voltar desta profundidade", true
+    end
+    for level = 1, depth do
+      if occupied() then reason = "Inventario cheio"; break end
+      local ok, err = inspectAndDig(turtle.inspectDown, turtle.digDown, "")
+      if not ok then reason = err; break end
+      if level < depth then
+        if not ensureFuel(#trail + 2 * (depth - level)) then
+          reason = "Limite de combustivel na escavacao"; break
+        end
+        ok, err = climb("baixo")
+        if not ok then reason = "Descida bloqueada: " .. tostring(err); break end
+        descent = descent + 1
+      end
+    end
+    for i = 1, descent do
+      ensureFuel(#trail + 1)
+      local ok, err = climb("cima")
+      if not ok then
+        status = "Retorno vertical bloqueado: " .. tostring(err)
+        report()
+        return false, status, false
+      end
+    end
+    return reason == nil, reason, true
+  end
+  local function visit(c, r)
+    local ok, err = reach(c, r)
+    if not ok then return false, err, true end
+    local before = select(2, inventory())
+    local surface
+    ok, err, surface = digColumn()
+    if not surface then return false, err, false end
+    if ok then progress = progress + 1 end
+    status = ok and ("Escavando area: " .. progress .. "/" .. total) or err
+    report(before)
+    if progress % 10 == 0 then print(status) end
+    return ok, err, true
+  end
+  local function returnTrail()
+    status = "Retornando da area"
+    report()
+    for i = #trail, 1, -1 do
+      local reverse = (trail[i] + 2) % 4
+      if not faceHeading(reverse) then return false, "Falha ao girar na volta" end
+      ensureFuel(1)
+      local ok, err = advance()
+      if not ok then return false, "Retorno bloqueado: " .. tostring(err) end
+      if i % 16 == 0 then report() end
+    end
+    if not faceHeading(originalHeading) then return false, "Falha ao restaurar direcao" end
+    return true
+  end
+
+  local ok, reason, onSurface = true, nil, true
+  for c = 0, width - 1 do
+    ok, reason, onSurface = visit(c, 0)
+    if not ok then break end
+  end
+  if ok then
+    for r = 1, height - 1 do
+      ok, reason, onSurface = visit(width - 1, r)
+      if not ok then break end
+    end
+  end
+  if ok and height > 1 then
+    for c = width - 2, 0, -1 do
+      ok, reason, onSurface = visit(c, height - 1)
+      if not ok then break end
+    end
+  end
+  if ok and width > 1 then
+    for r = height - 2, 1, -1 do
+      ok, reason, onSurface = visit(0, r)
+      if not ok then break end
+    end
+  end
+  if ok and width > 2 and height > 2 then
+    for r = 1, height - 2 do
+      if r % 2 == 1 then
+        for c = 1, width - 2 do
+          ok, reason, onSurface = visit(c, r)
+          if not ok then break end
+        end
+      else
+        for c = width - 2, 1, -1 do
+          ok, reason, onSurface = visit(c, r)
+          if not ok then break end
+        end
+      end
+      if not ok then break end
+    end
+  end
+  if onSurface then
+    local returned, err = returnTrail()
+    status = returned and (reason or "Area concluida") or err
+  end
+  print(status)
+  report()
+end
+
 report()
 while true do
   print("Pedido (ex.: tunel de 5 blocos a direita; sair):")
@@ -260,6 +416,17 @@ while true do
       status = err; print(err); report()
     elseif plan.task == "unsupported" then
       status = "Pedido nao suportado"; print(status); report()
+    elseif plan.task == "area" and type(plan.width) == "number"
+       and type(plan.height) == "number" and type(plan.depth) == "number"
+       and plan.width % 1 == 0 and plan.height % 1 == 0 and plan.depth % 1 == 0
+       and plan.width >= 1 and plan.width <= 256
+       and plan.height >= 1 and plan.height <= 256
+       and plan.depth >= 1 and plan.depth <= 64 then
+      print("Area: " .. plan.width .. "x" .. plan.height
+        .. ", profundidade " .. plan.depth .. " | contorno e interior")
+      write("Executar? (sim/nao): ")
+      if read():lower() == "sim" then executeArea(plan)
+      else status = "Cancelado"; report() end
     elseif (plan.task == "tunnel" or plan.task == "mine_target" or plan.task == "place")
        and (plan.direction == "frente" or plan.direction == "tras"
             or plan.direction == "direita" or plan.direction == "esquerda"
