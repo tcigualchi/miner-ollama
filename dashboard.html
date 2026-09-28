@@ -9,14 +9,15 @@
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#e4f2dc;font:16px/1.5 monospace;background-image:linear-gradient(#1e2b2a 1px,transparent 1px),linear-gradient(90deg,#1e2b2a 1px,transparent 1px);background-size:32px 32px}
     header,main,footer{max-width:1120px;margin:auto;padding:24px}header{padding-top:52px;display:flex;justify-content:space-between;align-items:end;gap:18px}
     h1,h2,p{margin:0}h1{font-size:clamp(28px,5vw,54px);color:var(--green);line-height:1.1;letter-spacing:-3px;text-shadow:4px 4px #304b38}h2{color:var(--green);font-size:17px;letter-spacing:2px;margin-bottom:20px}small,.muted{color:var(--muted)}.eyebrow{color:var(--gold);letter-spacing:3px;margin-bottom:10px}.badge{padding:8px 12px;background:#243327;border:2px solid var(--edge);white-space:nowrap;color:var(--gold)}
-    .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.box{background:var(--panel);border:3px solid var(--edge);box-shadow:6px 6px 0 #0a0e10;padding:24px;margin-bottom:18px;min-width:0}.hero{min-height:238px;display:flex;align-items:center;justify-content:space-between;gap:20px}.turtle{font-size:90px;line-height:1;filter:drop-shadow(7px 7px #0c1513);transform:scaleX(-1)}.status{font-size:23px;color:var(--gold);overflow-wrap:anywhere}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}.stat{background:#14201f;padding:12px;border:1px solid #425843}.stat strong{font-size:23px;display:block;color:white}.bar{height:18px;background:#101a19;border:2px solid #425843;margin-top:18px}.fill{height:100%;width:0;background:repeating-linear-gradient(90deg,var(--green) 0 16px,#86cb61 16px 20px);transition:width .4s}
+    .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.box{background:var(--panel);border:3px solid var(--edge);box-shadow:6px 6px 0 #0a0e10;padding:24px;margin-bottom:18px;min-width:0}.hero{min-height:238px;display:flex;align-items:center;justify-content:space-between;gap:20px}.turtle{font-size:90px;line-height:1;filter:drop-shadow(7px 7px #0c1513);transform:scaleX(-1)}.status{font-size:23px;color:var(--gold);overflow-wrap:anywhere}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}.stat{background:#14201f;padding:12px;border:1px solid #425843}.stat strong{font-size:23px;display:block;color:white}.bar{height:18px;background:#101a19;border:2px solid #425843;margin-top:18px}.fill{height:100%;width:0;background:repeating-linear-gradient(90deg,var(--green) 0 16px,#86cb61 16px 20px);transition:width .4s}.login{max-width:520px;margin:0 auto 18px}.login label{display:block;margin-bottom:8px;color:var(--gold)}.login form{display:flex;gap:8px}.login input{min-width:0;flex:1;background:#101a19;color:white;border:2px solid var(--edge);padding:12px;font:inherit}.login button{background:var(--green);border:2px solid #567845;color:#132019;padding:12px 16px;font:inherit;font-weight:bold;cursor:pointer}.login-error{color:var(--red);margin-top:10px}.locked{filter:blur(5px);pointer-events:none}
     .compass{display:grid;place-items:center;min-height:155px;font-size:85px;color:var(--green);text-shadow:5px 5px #273e35}.coords{text-align:center;color:var(--gold);font-size:19px}.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.slot{min-height:76px;background:#14201f;border:2px solid #3d5848;padding:7px;overflow:hidden}.slot.empty{opacity:.45}.slot small{display:block;color:var(--gold)}.slot span{display:block;overflow-wrap:anywhere;font-size:13px}.slot b{float:right;color:var(--green)}.loot{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.loot div{padding:10px;border-left:4px solid var(--gold);background:#14201f;overflow-wrap:anywhere}.loot b{color:var(--green);float:right;margin-left:5px}canvas.turtle{width:128px;height:128px;image-rendering:pixelated;flex:none}footer{color:var(--muted);padding-bottom:45px}@media(max-width:740px){header{display:block}.badge{display:inline-block;margin-top:18px}.grid{grid-template-columns:1}.hero{min-height:190px}canvas.turtle{width:64px;height:64px}.stats{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
 <body>
   <header><div><div class="eyebrow">◈ CC:TWEAKED / OLLAMA</div><h1>MINER//CONTROL</h1><p class="muted">Painel de expedição da Mining Turtle</p></div><span class="badge" id="connection">● AGUARDANDO</span></header>
   <main>
-    <div class="grid">
+    <section class="box login" id="login" hidden><h2>ACESSO AO PAINEL</h2><form id="login-form"><label for="token-input" class="muted">Token</label><input id="token-input" type="password" autocomplete="off" placeholder="Digite o token da turtle" required><button type="submit">ENTRAR</button></form><p class="login-error" id="login-error" role="alert"></p></section>
+    <div class="grid" id="dashboard-grid">
       <div>
         <section class="box hero"><div><h2>ESTADO DA MISSÃO</h2><p class="status" id="status">Aguardando turtle</p><div class="stats"><div class="stat">COMBUSTÍVEL<strong id="fuel">—</strong></div><div class="stat">PROGRESSO<strong id="progress">0 / 0</strong></div><div class="stat">ITENS<strong id="items">0</strong></div></div><div class="bar"><div class="fill" id="bar"></div></div></div><canvas class="turtle" width="16" height="16" aria-label="Turtle em pixel art"></canvas></section>
         <section class="box"><h2>INVENTÁRIO / 16 SLOTS</h2><div class="slots" id="slots"></div></section>
@@ -28,7 +29,7 @@
       </div>
     </div>
   </main>
-  <footer>Atualização automática a cada 2 segundos · Disponível apenas neste computador</footer>
+  <footer>Atualização automática a cada 2 segundos · Acesso remoto protegido por token</footer>
   <script>
     const $=id=>document.getElementById(id), dirs={norte:"↑",leste:"→",sul:"↓",oeste:"←"};
     const sprite=["................",".....DDDDDD.....","...DDGGGGGGDD...","..DGGGGGGGGGGD..",".DGGLGGGGGGLGGD.",".DGGLGGGGGGLGGD.","DGGGGGGGGGGGGGGD","DGGLGGDDGGGGLGGD","DGGLGGDDGGGGLGGD","DGGGGGGGGGGGGGGD",".DGGLGGGGGGLGGD.",".DGGLGGGGGGLGGD.","..DGGGGGGGGGGD..","...DDGGGGGGDD...",".....DDDDDD.....","................"];
@@ -61,7 +62,16 @@
         count.textContent="×"+n;row.textContent=label(name);row.append(count);return row;
       }));}else $("loot").textContent="Nenhum item registrado.";
     }
-    async function poll(){try{const r=await fetch("/api/state",{cache:"no-store"});if(!r.ok)throw Error();update(await r.json())}
+    const remote=location.port!=="8766";
+    let accessToken=remote?(sessionStorage.getItem("minerToken")||""):"";
+    function showLogin(message=""){$("login").hidden=false;$("dashboard-grid").classList.add("locked");$("login-error").textContent=message;}
+    function hideLogin(){$("login").hidden=true;$("dashboard-grid").classList.remove("locked");$("login-error").textContent="";}
+    if(remote&&!accessToken)showLogin();
+    $("login-form").addEventListener("submit",e=>{e.preventDefault();accessToken=$("token-input").value;sessionStorage.setItem("minerToken",accessToken);poll();});
+    async function poll(){if(remote&&!accessToken)return;
+      try{const r=await fetch("/api/state",{cache:"no-store",headers:remote?{"X-Miner-Token":accessToken}:{}});
+        if(r.status===401){sessionStorage.removeItem("minerToken");accessToken="";showLogin("Token incorreto. Confira MINER_TOKEN no servidor.");return;}
+        if(!r.ok)throw Error();update(await r.json());hideLogin();}
       catch{$("connection").textContent="● SEM CONEXÃO";}}
     poll();setInterval(poll,2000);
   </script>
