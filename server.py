@@ -14,14 +14,14 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = {"online": False, "status": "Aguardando turtle", "inventory": [],
          "collected": {}, "position": {"x": 0, "y": 0, "z": 0},
-         "heading": "norte", "fuel": 0, "progress": 0, "total": 0}
+         "heading": "norte", "fuel": 0, "progress": 0, "total": 0, "estimate": 0}
 LOCK = threading.Lock()
 SCHEMA = {
     "type": "object",
     "properties": {
-        "task": {"type": "string", "enum": ["tunnel", "mine_target", "unsupported"]},
-        "direction": {"type": "string", "enum": ["frente", "tras", "direita", "esquerda"]},
-        "length": {"type": "integer", "minimum": 0, "maximum": 64},
+        "task": {"type": "string", "enum": ["tunnel", "mine_target", "place", "unsupported"]},
+        "direction": {"type": "string", "enum": ["frente", "tras", "direita", "esquerda", "cima", "baixo"]},
+        "length": {"type": "integer", "minimum": 0, "maximum": 4096},
         "block": {"type": "string"},
     },
     "required": ["task", "direction", "length", "block"],
@@ -84,18 +84,24 @@ class Handler(BaseHTTPRequestHandler):
                 "format": SCHEMA, "options": {"temperature": 0},
                 "prompt": (
                     "Converta o pedido em JSON para uma Mining Turtle. "
-                    "tunnel abre tunel horizontal de 2 blocos de altura por length blocos. "
+                    "tunnel abre tunel horizontal de 2 blocos de altura, ou escava poco vertical "
+                    "de 1 bloco de largura para cima/baixo, por length passos (1 a 4096). "
                     "mine_target percorre ate length blocos e minera somente o bloco block indicado; "
                     "block deve ser id exato Minecraft, como minecraft:diamond_ore. "
-                    "direction relativa a frente atual: frente, tras, direita, esquerda. "
+                    "place coloca UM bloco do inventario adjacente, com length=1 e block="
+                    "id Minecraft exato do item, por exemplo minecraft:cobblestone. "
+                    "direction relativa a frente atual: frente, tras, direita, esquerda, cima, baixo. "
                     "Sem direcao, use frente. tunnel usa block vazio. "
-                    "Sem comprimento ou para escavacao vertical, use unsupported com length=0, "
+                    "Sem comprimento para tunnel/mine_target use unsupported com length=0, "
                     "direction=frente, block vazio. "
                     "Exemplo: abra um tunel de 3 blocos a direita => "
                     '{"task":"tunnel","direction":"direita","length":3,"block":""}. '
                     "Exemplo: procure minerio de diamante por 12 blocos a esquerda => "
                     '{"task":"mine_target","direction":"esquerda","length":12,'
-                    '"block":"minecraft:diamond_ore"}. Pedido: ' + prompt),
+                    '"block":"minecraft:diamond_ore"}. '
+                    "Exemplo: coloque pedra abaixo => "
+                    '{"task":"place","direction":"baixo","length":1,"block":"minecraft:cobblestone"}. '
+                    "Pedido: " + prompt),
             }
             request = urllib.request.Request(
                 OLLAMA_URL, json.dumps(payload).encode("utf-8"),
@@ -103,16 +109,18 @@ class Handler(BaseHTTPRequestHandler):
             with urllib.request.urlopen(request, timeout=55) as response:
                 raw = json.load(response)["response"]
             plan = json.loads(raw)
-            if not isinstance(plan, dict) or plan.get("task") not in ("tunnel", "mine_target", "unsupported"):
+            if not isinstance(plan, dict) or plan.get("task") not in ("tunnel", "mine_target", "place", "unsupported"):
                 return self.reply(422, {"error": "Plano invalido: " + str(raw)[:150]})
             if plan["task"] == "unsupported":
                 return self.reply(200, {"task": "unsupported", "direction": "frente", "length": 0, "block": ""})
             direction, length, block = plan.get("direction"), plan.get("length"), plan.get("block")
-            if direction not in ("frente", "tras", "direita", "esquerda") or type(length) is not int or not 1 <= length <= 64:
+            if direction not in ("frente", "tras", "direita", "esquerda", "cima", "baixo") or type(length) is not int or not 1 <= length <= 4096:
                 return self.reply(422, {"error": "Direcao/comprimento invalidos: " + str(raw)[:150]})
-            if plan["task"] == "mine_target":
+            if plan["task"] in ("mine_target", "place"):
                 if not isinstance(block, str) or not block.startswith("minecraft:") or not 1 <= len(block) <= 64:
                     return self.reply(422, {"error": "Bloco invalido: " + str(raw)[:150]})
+                if plan["task"] == "place" and length != 1:
+                    return self.reply(422, {"error": "Colocacao aceita um bloco por comando"})
             else:
                 block = ""
             return self.reply(200, {"task": plan["task"], "direction": direction, "length": length, "block": block})

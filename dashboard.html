@@ -19,7 +19,7 @@
     <section class="box login" id="login" hidden><h2>ACESSO AO PAINEL</h2><form id="login-form"><label for="token-input" class="muted">Token</label><input id="token-input" type="password" autocomplete="off" placeholder="Digite o token da turtle" required><button type="submit">ENTRAR</button></form><p class="login-error" id="login-error" role="alert"></p></section>
     <div class="grid" id="dashboard-grid">
       <div>
-        <section class="box hero"><div><h2>ESTADO DA MISSÃO</h2><p class="status" id="status">Aguardando turtle</p><div class="stats"><div class="stat">COMBUSTÍVEL<strong id="fuel">—</strong></div><div class="stat">PROGRESSO<strong id="progress">0 / 0</strong></div><div class="stat">ITENS<strong id="items">0</strong></div></div><div class="bar"><div class="fill" id="bar"></div></div></div><canvas class="turtle" width="16" height="16" aria-label="Turtle em pixel art"></canvas></section>
+        <section class="box hero"><div><h2>ESTADO DA MISSÃO</h2><p class="status" id="status">Aguardando turtle</p><div class="stats"><div class="stat">COMBUSTÍVEL<strong id="fuel">—</strong></div><div class="stat">IDA + VOLTA<strong id="estimate">—</strong></div><div class="stat">PROGRESSO<strong id="progress">0 / 0</strong></div><div class="stat">ITENS<strong id="items">0</strong></div></div><div class="bar"><div class="fill" id="bar"></div></div></div><canvas class="turtle" width="16" height="16" aria-label="Turtle em pixel art"></canvas></section>
         <section class="box"><h2>INVENTÁRIO / 16 SLOTS</h2><div class="slots" id="slots"></div></section>
       </div>
       <div>
@@ -40,6 +40,7 @@
       $("connection").textContent=s.online?"● CONECTADA":"● AGUARDANDO";
       $("status").textContent=s.status||"Aguardando";
       $("fuel").textContent=s.fuel===undefined?"—":s.fuel;
+      $("estimate").textContent=s.estimate||"—";
       $("progress").textContent=(s.progress||0)+" / "+(s.total||0);
       $("bar").style.width=(s.total?Math.min(100,100*s.progress/s.total):0)+"%";
       $("compass").textContent=dirs[s.heading]||"↑";
