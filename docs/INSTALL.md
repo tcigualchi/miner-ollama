@@ -29,7 +29,7 @@ O Pocket Computer deve estar com o jogador e em alcance da rede GPS:
 
     wget run https://URL/bootstrap/beacon.lua https://URL TOKEN_DO_BEACON "João"
 
-O beacon envia nome, X, Y, Z e dimensão configurada (o quarto argumento opcional, por exemplo `minecraft:the_nether`). Venha até mim navega ao último local recebido e exige que o beacon esteja ativo e atualizado nos últimos 12 segundos.
+O beacon envia nome, X, Y, Z e dimensão configurada (o quarto argumento opcional, por exemplo `minecraft:the_nether`). Venha até mim navega ao último local recebido e exige que o beacon esteja ativo e atualizado nos últimos 30 segundos.
 
 ## Compatibilidade com o controlador antigo
 

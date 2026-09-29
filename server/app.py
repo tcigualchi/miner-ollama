@@ -34,7 +34,7 @@ if not ENROLLMENT_TOKEN or ENROLLMENT_TOKEN == "CHANGE-ME":
 if not PLAYER_BEACON_TOKEN or PLAYER_BEACON_TOKEN == "CHANGE-ME" or PLAYER_BEACON_TOKEN == ENROLLMENT_TOKEN:
     raise RuntimeError("Defina PLAYER_BEACON_TOKEN diferente do token de cadastro.")
 
-app = FastAPI(title="CC Fleet OS", version="3.0.1")
+app = FastAPI(title="CC Fleet OS", version="3.0.2")
 templates = Jinja2Templates(directory=str(BASE / "templates"))
 app.mount("/agent", StaticFiles(directory=str(ROOT / "turtle")), name="agent")
 
@@ -469,7 +469,7 @@ def player_target(agent_id: str, x_agent_token: str | None = Header(default=None
         row = con.execute("SELECT * FROM players ORDER BY updated_at DESC LIMIT 1").fetchone()
     if not row:
         raise HTTPException(404, "nenhum beacon de jogador ativo")
-    if now() - row["updated_at"] > 12:
+    if now() - row["updated_at"] > int(os.getenv("BEACON_STALE_AFTER_SECONDS", "30")):
         raise HTTPException(409, "beacon do jogador está offline; atualize sua posição no Pocket Computer")
     return dict(row)
 

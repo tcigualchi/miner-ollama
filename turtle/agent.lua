@@ -58,9 +58,14 @@ local function run()
         state.write({status = "IDLE"})
       else
         local message = tostring(result)
-      local recoverable = message:find("combustível", 1, true) or message:find("inventário cheio", 1, true)
+        local lower=message:lower()
+        local follow_retry=task.kind=="follow_player" and (lower:find("conflict",1,true)
+          or lower:find("http 404",1,true) or lower:find("http 409",1,true)
+          or lower:find("not found",1,true) or lower:find("could not connect",1,true)
+          or lower:find("timed out",1,true) or lower:find("continuou se movendo",1,true))
+        local recoverable = message:find("combustível", 1, true) or message:find("inventário cheio", 1, true)
           or message:find("GPS indisponível", 1, true) or message:find("beacon", 1, true)
-          or message:find("bloqueado", 1, true) or message:find("base não configurada", 1, true)
+          or message:find("bloqueado", 1, true) or message:find("base não configurada", 1, true) or follow_retry
         if recoverable then
           net.progress(task.id, "BLOCKED", 0, message, state.read().checkpoint, "WARN")
           state.write({status = "BLOCKED"})
