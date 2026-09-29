@@ -27,6 +27,7 @@ WEB_PASSWORD = os.getenv("WEB_PASSWORD")
 ENROLLMENT_TOKEN = os.getenv("FLEET_ENROLLMENT_TOKEN", os.getenv("FLEET_TOKEN"))
 PLAYER_BEACON_TOKEN = os.getenv("PLAYER_BEACON_TOKEN", ENROLLMENT_TOKEN)
 OFFLINE_AFTER = int(os.getenv("OFFLINE_AFTER_SECONDS", "20"))
+BEACON_STALE_AFTER = int(os.getenv("BEACON_STALE_AFTER_SECONDS", "30"))
 if not WEB_PASSWORD or WEB_PASSWORD == "CHANGE-ME":
     raise RuntimeError("Defina WEB_PASSWORD com uma senha forte antes de iniciar o servidor.")
 if not ENROLLMENT_TOKEN or ENROLLMENT_TOKEN == "CHANGE-ME":
@@ -34,7 +35,7 @@ if not ENROLLMENT_TOKEN or ENROLLMENT_TOKEN == "CHANGE-ME":
 if not PLAYER_BEACON_TOKEN or PLAYER_BEACON_TOKEN == "CHANGE-ME" or PLAYER_BEACON_TOKEN == ENROLLMENT_TOKEN:
     raise RuntimeError("Defina PLAYER_BEACON_TOKEN diferente do token de cadastro.")
 
-app = FastAPI(title="CC Fleet OS", version="3.0.2")
+app = FastAPI(title="CC Fleet OS", version="3.0.3")
 templates = Jinja2Templates(directory=str(BASE / "templates"))
 app.mount("/agent", StaticFiles(directory=str(ROOT / "turtle")), name="agent")
 
@@ -469,7 +470,7 @@ def player_target(agent_id: str, x_agent_token: str | None = Header(default=None
         row = con.execute("SELECT * FROM players ORDER BY updated_at DESC LIMIT 1").fetchone()
     if not row:
         raise HTTPException(404, "nenhum beacon de jogador ativo")
-    if now() - row["updated_at"] > int(os.getenv("BEACON_STALE_AFTER_SECONDS", "30")):
+    if now() - row["updated_at"] > BEACON_STALE_AFTER:
         raise HTTPException(409, "beacon do jogador está offline; atualize sua posição no Pocket Computer")
     return dict(row)
 
@@ -494,7 +495,7 @@ def dashboard(ccfleet_session: str | None = Cookie(default=None)):
         agents = [agent_row(row) for row in con.execute("SELECT * FROM agents ORDER BY name").fetchall()]
         tasks = [task_row(row) for row in con.execute("SELECT * FROM tasks ORDER BY updated_at DESC LIMIT 100").fetchall()]
         logs = [dict(row) | {"data": loads(row["data"], {})} for row in con.execute("SELECT * FROM logs ORDER BY id DESC LIMIT 150").fetchall()]
-        players = [dict(row) for row in con.execute("SELECT * FROM players ORDER BY updated_at DESC").fetchall()]
+        players = [dict(row) for row in con.execute("SELECT * FROM players WHERE updated_at>=? ORDER BY updated_at DESC", (now()-BEACON_STALE_AFTER,)).fetchall()]
     return {"agents": agents, "tasks": tasks, "logs": logs, "players": players, "offline_after": OFFLINE_AFTER}
 
 

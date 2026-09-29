@@ -26,7 +26,13 @@ function M.heartbeat(data)
   return ok, err
 end
 function M.next_task() return request("GET", "/api/agents/" .. cfg.agent_id .. "/tasks/next") end
-function M.player_target() return request("GET", "/api/agents/" .. cfg.agent_id .. "/player-target") end
+function M.player_target()
+  local target,err=request("GET", "/api/agents/" .. cfg.agent_id .. "/player-target")
+  if not target and err and (err:find("Not Found",1,true) or err:find("404",1,true)) then
+    return nil,"Nenhuma posicao recente do Pocket Beacon chegou ao servidor (HTTP 404). Inicie o beacon no Pocket, confira o token e aguarde o marcador do jogador no mapa."
+  end
+  return target,err
+end
 function M.progress(id, status, progress, message, checkpoint, level)
   return request("POST", "/api/agents/" .. cfg.agent_id .. "/tasks/" .. id .. "/progress", {
     state=status, progress=progress, message=message, checkpoint=checkpoint or {}, log_level=level or "INFO"
