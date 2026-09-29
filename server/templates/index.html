@@ -3,289 +3,69 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CC Fleet AI v2</title>
+  <meta name="theme-color" content="#071018">
+  <title>CC Fleet OS</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #172554;
-      --panel-2: #1e3a8a;
-      --line: #60a5fa;
-      --accent: #f59e0b;
-      --good: #22c55e;
-      --bad: #ef4444;
-      --text: #eff6ff;
-      --muted: #bfdbfe;
-      --shadow: 0 0 0 2px #1d4ed8, 0 0 0 6px #0b1120;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Courier New", monospace;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 16px,
-        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px) 0 0/16px 100%,
-        var(--bg);
-      color: var(--text);
-    }
-    .wrap { max-width: 1500px; margin: 0 auto; padding: 22px; }
-    .hero {
-      background: linear-gradient(180deg, #1d4ed8, #172554);
-      border: 2px solid #93c5fd;
-      box-shadow: var(--shadow);
-      padding: 18px;
-      margin-bottom: 22px;
-    }
-    .hero h1 { margin: 0 0 8px; font-size: 32px; letter-spacing: 1px; }
-    .hero p { margin: 0; color: var(--muted); }
-    .grid {
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 22px;
-      align-items: start;
-    }
-    .panel {
-      background: rgba(23, 37, 84, .92);
-      border: 2px solid #93c5fd;
-      box-shadow: var(--shadow);
-      padding: 16px;
-    }
-    .panel h2, .panel h3 { margin-top: 0; }
-    .stack { display: grid; gap: 16px; }
-    .small-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    label { display: block; font-weight: bold; margin-bottom: 6px; }
-    input, textarea, button, select {
-      width: 100%;
-      font-family: inherit;
-      font-size: 14px;
-      background: #0f172a;
-      color: var(--text);
-      border: 2px solid #60a5fa;
-      padding: 10px;
-      outline: none;
-    }
-    button {
-      cursor: pointer;
-      background: linear-gradient(180deg, #f59e0b, #d97706);
-      color: #1f1300;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-    button:hover { filter: brightness(1.08); }
-    textarea { min-height: 100px; resize: vertical; }
-    .fleet-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: 14px;
-    }
-    .turtle {
-      background: linear-gradient(180deg, #1e3a8a, #172554);
-      border: 2px solid #93c5fd;
-      padding: 12px;
-    }
-    .state { display: inline-block; padding: 4px 8px; border: 2px solid #fff; margin-bottom: 8px; font-weight: bold; }
-    .state.IDLE { background: #166534; }
-    .state.BUILDING, .state.MOVING, .state.DIGGING, .state.QUARRY { background: #92400e; }
-    .state.ERROR { background: #991b1b; }
-    .state.WAITING_MATERIAL { background: #7c2d12; }
-    .kv { display: grid; grid-template-columns: 100px 1fr; gap: 6px; font-size: 13px; }
-    .mono { white-space: pre-wrap; word-break: break-word; background:#0b1120; padding:10px; border:1px solid #60a5fa; }
-    .event-list, .queue-list { max-height: 520px; overflow: auto; display: grid; gap: 10px; }
-    .event, .queue-item { border: 1px solid #60a5fa; background:#0b1120; padding:10px; }
-    .okbox { border-left: 5px solid var(--good); }
-    .errbox { border-left: 5px solid var(--bad); }
-    .tabs { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; margin-bottom: 12px; }
-    .tip { font-size: 12px; color: var(--muted); }
-    @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+    :root{color-scheme:dark;--bg:#071018;--panel:#101e29;--deep:#09141d;--line:#355469;--ink:#edf7ed;--muted:#9eb4b8;--lime:#b8f575;--cyan:#76dff2;--amber:#ffce70;--red:#ff858d;--shadow:#03080c}
+    *{box-sizing:border-box} body{margin:0;min-width:320px;color:var(--ink);font:14px/1.5 Consolas,"Courier New",monospace;background:linear-gradient(#ffffff08 1px,transparent 1px) 0 0/24px 24px,linear-gradient(90deg,#ffffff08 1px,transparent 1px) 0 0/24px 24px,var(--bg)}
+    button,input,textarea{font:inherit} button{cursor:pointer} button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+    .shell{max-width:1500px;margin:auto;padding:20px clamp(13px,3vw,42px) 52px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:17px;border-bottom:2px dashed #355469}.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.1em}.logo{display:grid;place-items:center;width:42px;height:42px;border:2px solid var(--lime);background:#203e2b;box-shadow:4px 4px #315943;color:var(--lime);font-size:23px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.07em}.connection{display:flex;gap:8px;align-items:center;border:2px solid var(--line);background:var(--panel);padding:7px 10px;color:var(--muted);font-size:11px}.dot{width:9px;height:9px;background:var(--red);box-shadow:0 0 0 2px #713c44}.dot.ok{background:var(--lime);box-shadow:0 0 0 2px #47764c}
+    .hero{position:relative;overflow:hidden;margin:24px 0;padding:25px 30px;border:2px solid #719980;background:linear-gradient(110deg,#17352f,#234439 60%,#1a2d35);box-shadow:6px 6px var(--shadow)}.hero:after{content:"";position:absolute;right:9%;top:25px;width:25px;height:25px;background:var(--lime);opacity:.7;box-shadow:29px 0 #547c5e,58px 0 #2b4b43,0 29px #3f704d,29px 29px var(--lime),58px 29px #3f704d,0 58px #29493c,29px 58px #3f704d}.eyebrow{color:var(--lime);font-size:11px;font-weight:bold;letter-spacing:.13em}.eyebrow:before{content:"// "}h1{position:relative;z-index:1;max-width:700px;margin:8px 0;font-size:clamp(28px,4vw,50px);line-height:1.1;text-transform:uppercase;text-shadow:3px 3px #0a191a}.hero p{position:relative;z-index:1;max-width:650px;margin:0;color:#d0e5d4;font-size:12px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:0 0 24px}.stat,.panel{border:2px solid var(--line);background:var(--panel);box-shadow:4px 4px var(--shadow)}.stat{padding:15px 18px}.stat span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.stat strong{display:block;margin-top:5px;font-size:27px;line-height:1.1;font-variant-numeric:tabular-nums}.stat:nth-child(2) strong{color:var(--lime)}.stat:nth-child(3) strong{color:var(--amber)}
+    .grid{display:grid;grid-template-columns:minmax(330px,410px) minmax(0,1fr);gap:22px;align-items:start}.stack{display:grid;gap:22px}.panel{min-width:0}.inside{padding:19px}.heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.heading h2{margin:0;font-size:16px;text-transform:uppercase}.heading h2:before{content:"> ";color:var(--lime)}.heading p{margin:3px 0 0;color:var(--muted);font-size:11px}.tag{padding:4px 7px;border:1px solid #5e8a62;color:var(--lime);background:#263d2e;font-size:10px;white-space:nowrap}
+    label{display:block;margin:0 0 6px;color:#d4e4d8;font-size:11px;text-transform:uppercase}.task-text{width:100%;min-height:128px;resize:vertical;padding:11px;border:2px solid #557385;background:var(--deep);color:var(--ink)}.task-text::placeholder{color:#7f999e}.hint{margin:10px 0 0;color:var(--muted);font-size:11px}.send{width:100%;min-height:48px;margin-top:16px;border:2px solid #deffa7;background:var(--lime);box-shadow:4px 4px #426d43;color:#102112;font-weight:bold;font-size:12px;text-transform:uppercase}.send:hover{filter:brightness(1.09);transform:translate(-1px,-1px)}.send:active{box-shadow:1px 1px #426d43;transform:translate(3px,3px)}.send:disabled{opacity:.6;cursor:wait}
+    .agent-select{display:grid;gap:8px;max-height:280px;overflow:auto}.agent-option{display:flex;align-items:center;gap:9px;border:1px solid #405f70;background:#0b1721;padding:10px;cursor:pointer}.agent-option:has(input:checked){border-color:var(--lime);background:#193128}.agent-option input{accent-color:var(--lime);width:17px;height:17px;margin:0}.agent-option strong{display:block;font-size:12px}.agent-option small{display:block;color:var(--muted);font-size:10px}.agent-option .status{margin-left:auto}
+    .map{position:relative;min-height:310px;overflow:hidden;border:2px solid #344f61;background:radial-gradient(circle at center,#143344,#09151f 72%)}.map-grid{position:absolute;inset:0;background:linear-gradient(#70b1c219 1px,transparent 1px) 0 0/25px 25px,linear-gradient(90deg,#70b1c219 1px,transparent 1px) 0 0/25px 25px}.axis{position:absolute;color:#79a7b6;font-size:10px}.axis.n{top:8px;left:50%}.axis.s{bottom:8px;left:50%}.axis.w{left:9px;top:50%}.axis.e{right:9px;top:50%}.map-empty{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:11px}.pin{position:absolute;z-index:2;width:15px;height:15px;transform:translate(-50%,-50%);border:2px solid #061016;background:var(--cyan);box-shadow:3px 3px #183d49}.pin.player{background:var(--amber);box-shadow:3px 3px #624c22}.pin.base{background:var(--lime);box-shadow:3px 3px #47764c}.pin.offline{background:#68777b;box-shadow:none}.pin:focus{outline:2px solid var(--lime)}.map-legend{display:flex;gap:13px;margin-top:10px;color:var(--muted);font-size:10px}.map-legend i{display:inline-block;width:10px;height:10px;margin-right:4px;background:var(--cyan)}.map-legend .player{background:var(--amber)}.map-legend .base{background:var(--lime)}
+    .agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:12px}.agent{border:2px solid #405f70;background:#0b1721;padding:13px;box-shadow:3px 3px #061016}.agent-top{display:flex;justify-content:space-between;gap:8px;align-items:start}.agent-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:bold}.state{border:1px solid #5a8d64;background:#254331;color:var(--lime);padding:3px 6px;font-size:10px}.state.offline,.state.error{border-color:#99525c;background:#4b3039;color:var(--red)}.state.working{border-color:#a58243;background:#493c2b;color:var(--amber)}.kv{display:grid;grid-template-columns:1fr auto;gap:5px 8px;margin-top:12px;color:var(--muted);font-size:11px}.kv b{color:var(--ink);font-weight:normal;text-align:right}.agent details{margin-top:12px;padding-top:9px;border-top:1px solid #345064}.agent summary{color:var(--muted);cursor:pointer;font-size:10px}.agent pre,.item pre{white-space:pre-wrap;overflow-wrap:anywhere;font:10px/1.45 Consolas,monospace}
+    .feed{display:grid;gap:9px;max-height:370px;overflow:auto}.item{border-left:3px solid var(--cyan);background:#0b1721;padding:10px 12px}.item.warn{border-color:var(--amber)}.item.error{border-color:var(--red)}.item strong{font-size:11px}.item small{display:block;color:var(--muted);font-size:10px}.progress{height:8px;margin-top:8px;background:#203343}.progress i{display:block;height:100%;background:var(--lime)}.toast{position:fixed;right:16px;bottom:16px;z-index:10;max-width:min(430px,calc(100% - 32px));padding:13px;border:2px solid var(--lime);background:#193128;box-shadow:4px 4px #020609;color:#e6f8db;font-size:12px}.hidden{display:none!important}
+    .login{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:#02070bd9}.login-box{width:min(420px,100%);border:2px solid var(--lime);background:var(--panel);box-shadow:7px 7px #020609;padding:23px}.login-box h2{margin:0 0 7px;text-transform:uppercase}.login-box p{color:var(--muted);font-size:11px}.login-box input{width:100%;height:46px;padding:10px;border:2px solid #557385;background:var(--deep);color:var(--ink)}.login-box .error{color:var(--red);font-size:11px;min-height:17px}
+    @media(max-width:950px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(4,1fr)}}@media(max-width:620px){.shell{padding:14px 12px 35px}.top{padding-bottom:12px}.brand{font-size:13px}.logo{width:36px;height:36px}.hero{margin:18px 0;padding:22px 17px}.hero:after{right:-18px;opacity:.25;transform:scale(.75)}.hero p{font-size:11px}.stats{gap:7px;margin-bottom:19px}.stat{padding:10px 8px;box-shadow:2px 2px var(--shadow)}.stat span{font-size:8px}.stat strong{font-size:19px}.stack,.grid{gap:16px}.inside{padding:15px 12px}.agents{grid-template-columns:1fr}.task-text{font-size:16px}.connection{font-size:10px}}@media(max-width:390px){.top .connection{padding:6px}.top .connection span:last-child{display:none}.stats{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="hero">
-    <h1>CC FLEET AI v2</h1>
-    <p>Painel estilo pixel, frota em tempo quase real, construções, navegação, escavação linear e quarry.</p>
-  </div>
-
-  {% if error %}
-  <div class="panel errbox" style="margin-bottom:16px;">
-    <h3>Erro</h3>
-    <div class="mono">{{ error }}</div>
-  </div>
-  {% endif %}
-
-  {% if result %}
-  <div class="panel okbox" style="margin-bottom:16px;">
-    <h3>{{ result.title }}</h3>
-    <div class="mono">{{ result | tojson(indent=2) }}</div>
-  </div>
-  {% endif %}
-
-  <div class="grid">
-    <div class="stack">
-      <div class="panel">
-        <h2>Comandos</h2>
-        <div class="tip">Use a mesma senha do WEB_PASSWORD. UTF-8 ativado para evitar caracteres quebrados.</div>
+  <div id="login" class="login"><form id="login-form" class="login-box"><div class="eyebrow">Acesso protegido</div><h2>CC Fleet OS</h2><p>Entre com a senha do painel. Ela só é enviada para criar uma sessão HTTP segura e não fica no código do site.</p><label for="password">Senha do painel</label><input id="password" type="password" autocomplete="current-password" required autofocus><div id="login-error" class="error"></div><button class="send" type="submit">Entrar no painel →</button></form></div>
+  <main class="shell">
+    <header class="top"><div class="brand"><div class="logo">▦</div><div>CC FLEET OS<small>Coordenação de agentes</small></div></div><div class="connection"><i id="dot" class="dot"></i><span id="connection">Conectando</span></div></header>
+    <section class="hero"><div class="eyebrow">Operações autônomas</div><h1>Uma ordem. Uma frota.</h1><p>Escolha as Turtles, descreva a tarefa e acompanhe o planejamento, a execução e a recuperação em tempo real.</p></section>
+    <section class="stats"><div class="stat"><span>Total</span><strong id="total">—</strong></div><div class="stat"><span>Online</span><strong id="online">—</strong></div><div class="stat"><span>Trabalhando</span><strong id="working">—</strong></div><div class="stat"><span>Tarefas abertas</span><strong id="tasks-open">—</strong></div></section>
+    <div class="grid">
+      <div class="stack">
+        <section class="panel"><div class="inside"><div class="heading"><div><h2>Nova tarefa</h2><p>O interpretador aceita tarefas seguras conhecidas.</p></div></div><form id="task-form"><label for="prompt">O que a frota deve fazer?</label><textarea id="prompt" class="task-text" required placeholder="Ex.: Venha até mim&#10;Mine uma área de 20x20&#10;Construa uma parede de pedra 30x10&#10;Construa uma casa 20x20"></textarea><p class="hint">“Venha até mim” usa o Pocket Beacon do jogador. Selecione uma ou mais Turtles abaixo.</p><button id="send" class="send" type="submit">Planejar e iniciar →</button></form></div></section>
+        <section class="panel"><div class="inside"><div class="heading"><div><h2>Equipe</h2><p>Sem seleção, a coordenação escolhe agentes livres.</p></div><span id="selected-count" class="tag">0 selecionadas</span></div><div id="agent-select" class="agent-select"><div class="item">Carregando agentes…</div></div></div></section>
       </div>
-
-      <div class="panel">
-        <h3>1) Construção com IA</h3>
-        <form method="post" action="/web/build">
-          <label>Senha do painel</label>
-          <input type="password" name="password" required>
-          <div class="small-grid">
-            <div><label>Controller ID</label><input type="number" name="controller_id" required></div>
-            <div><label>Turtle ID</label><input type="number" name="turtle_id" required></div>
-          </div>
-          <label>Origem da construção</label>
-          <div class="three">
-            <input type="number" name="x" placeholder="X" required>
-            <input type="number" name="y" placeholder="Y" required>
-            <input type="number" name="z" placeholder="Z" required>
-          </div>
-          <label>Pedido para a IA</label>
-          <textarea name="prompt" placeholder="Ex.: Casa medieval 13x11, dois andares, janelas e telhado." required></textarea>
-          <button type="submit">Criar plano e mandar construir</button>
-        </form>
-      </div>
-
-      <div class="panel">
-        <h3>2) Goto</h3>
-        <form method="post" action="/web/goto">
-          <label>Senha do painel</label>
-          <input type="password" name="password" required>
-          <div class="small-grid">
-            <div><label>Controller ID</label><input type="number" name="controller_id" required></div>
-            <div><label>Turtle ID</label><input type="number" name="turtle_id" required></div>
-          </div>
-          <div class="three">
-            <input type="number" name="x" placeholder="X" required>
-            <input type="number" name="y" placeholder="Y" required>
-            <input type="number" name="z" placeholder="Z" required>
-          </div>
-          <label><input type="checkbox" name="dig" value="1" style="width:auto;"> Permitir cavar durante o caminho</label>
-          <button type="submit">Enviar navegação</button>
-        </form>
-      </div>
-
-      <div class="panel">
-        <h3>3) Dig line</h3>
-        <form method="post" action="/web/dig">
-          <label>Senha do painel</label>
-          <input type="password" name="password" required>
-          <div class="small-grid">
-            <div><label>Controller ID</label><input type="number" name="controller_id" required></div>
-            <div><label>Turtle ID</label><input type="number" name="turtle_id" required></div>
-          </div>
-          <div class="small-grid">
-            <div><label>Comprimento</label><input type="number" name="length" required></div>
-            <div><label>Altura</label><input type="number" name="height" value="2" required></div>
-          </div>
-          <button type="submit">Enviar escavação linear</button>
-        </form>
-      </div>
-
-      <div class="panel">
-        <h3>4) Quarry</h3>
-        <form method="post" action="/web/quarry">
-          <label>Senha do painel</label>
-          <input type="password" name="password" required>
-          <div class="small-grid">
-            <div><label>Controller ID</label><input type="number" name="controller_id" required></div>
-            <div><label>Turtle ID</label><input type="number" name="turtle_id" required></div>
-          </div>
-          <div class="three">
-            <div><label>Largura</label><input type="number" name="width" required></div>
-            <div><label>Profundidade</label><input type="number" name="depth" required></div>
-            <div><label>Altura</label><input type="number" name="height" value="2" required></div>
-          </div>
-          <button type="submit">Enviar quarry</button>
-        </form>
+      <div class="stack">
+        <section class="panel"><div class="inside"><div class="heading"><div><h2>Mapa tático</h2><p>Posições GPS no plano X/Z; o norte fica no topo.</p></div></div><div id="map" class="map"><div class="map-grid"></div><span class="axis n">N</span><span class="axis s">S</span><span class="axis w">W</span><span class="axis e">E</span><div id="map-empty" class="map-empty">Aguardando localização GPS…</div></div><div class="map-legend"><span><i></i>Turtle online</span><span><i class="player"></i>Jogador beacon</span><span><i class="base"></i>Base configurada</span></div></div></section>
+        <section class="panel"><div class="inside"><div class="heading"><div><h2>Frota</h2><p>Estado, localização, combustível e inventário.</p></div></div><div id="agents" class="agents"><div class="item">Carregando frota…</div></div></div></section>
+        <section class="panel"><div class="inside"><div class="heading"><div><h2>Tarefas</h2><p>Fila, progresso e histórico recente.</p></div></div><div id="tasks" class="feed"><div class="item">Carregando tarefas…</div></div></div></section>
+        <section class="panel"><div class="inside"><div class="heading"><div><h2>Eventos e erros</h2><p>Logs enviados pelos agentes.</p></div></div><div id="logs" class="feed"><div class="item">Carregando logs…</div></div></div></section>
       </div>
     </div>
-
-    <div class="stack">
-      <div class="panel">
-        <h2>Frota em tempo real</h2>
-        <div id="fleet" class="fleet-grid"></div>
-      </div>
-      <div class="panel">
-        <h2>Fila de comandos</h2>
-        <div id="queue" class="queue-list"></div>
-      </div>
-      <div class="panel">
-        <h2>Eventos recentes</h2>
-        <div id="events" class="event-list"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<script>
-function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-}
-function pretty(obj){
-  try { return esc(JSON.stringify(obj, null, 2)); } catch(e) { return esc(String(obj)); }
-}
-async function loadFleet(){
-  const res = await fetch('/api/fleet');
-  const data = await res.json();
-  const wrap = document.getElementById('fleet');
-  if(!data.fleet.length){
-    wrap.innerHTML = '<div class="turtle">Nenhuma turtle reportou status ainda.</div>';
-    return;
-  }
-  wrap.innerHTML = data.fleet.map(t => `
-    <div class="turtle">
-      <div class="state ${esc(t.state)}">${esc(t.state || 'SEM ESTADO')}</div>
-      <div><strong>${esc(t.name || 'sem-nome')}</strong> <span class="tip">(#${esc(t.turtle_id)})</span></div>
-      <div class="kv">
-        <div>Central</div><div>${esc(t.controller_id)}</div>
-        <div>Posição</div><div>${esc(t.x)}, ${esc(t.y)}, ${esc(t.z)}</div>
-        <div>Fuel</div><div>${esc(t.fuel)}</div>
-        <div>Label</div><div>${esc(t.label || '')}</div>
-        <div>Ação</div><div>${esc((t.extra || {}).action || '-')}</div>
-        <div>Progresso</div><div>${esc((t.extra || {}).progress ?? '-')}%</div>
-        <div>Online</div><div>${(Date.now() - Number(t.server_received_ms || 0)) < 5000 ? 'SIM' : 'NÃO'}</div>
-      </div>
-      <div class="tip" style="margin-top:8px;">Inventário</div>
-      <div class="mono">${pretty(t.inventory || {})}</div>
-      <div class="tip" style="margin-top:8px;">Detalhes da tarefa</div>
-      <div class="mono">${pretty(t.extra || {})}</div>
-    </div>
-  `).join('');
-}
-async function loadQueue(){
-  const res = await fetch('/api/queue');
-  const data = await res.json();
-  const wrap = document.getElementById('queue');
-  const q = data.queue || [];
-  if(!q.length){
-    wrap.innerHTML = '<div class="queue-item">Fila vazia.</div>';
-    return;
-  }
-  wrap.innerHTML = q.map(c => `<div class="queue-item"><div><strong>${esc(c.command)}</strong> → turtle #${esc(c.turtle_id)}</div><div class="mono">${pretty(c)}</div></div>`).join('');
-}
-async function loadEvents(){
-  const res = await fetch('/api/events');
-  const data = await res.json();
-  const wrap = document.getElementById('events');
-  const ev = data.events || [];
-  if(!ev.length){
-    wrap.innerHTML = '<div class="event">Sem eventos ainda.</div>';
-    return;
-  }
-  wrap.innerHTML = ev.map(e => `<div class="event"><div><strong>${esc(e.kind)}</strong></div><div class="mono">${pretty(e)}</div></div>`).join('');
-}
-async function refreshAll(){
-  try {
-    await Promise.all([loadFleet(), loadQueue(), loadEvents()]);
-  } catch (e) {
-    console.error(e);
-  }
-}
-refreshAll();
-setInterval(refreshAll, 1000);
-</script>
+  </main>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script>
+    const $=id=>document.getElementById(id), esc=v=>String(v??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    let data={agents:[],tasks:[],logs:[],players:[]}, selected=new Set(), socket, timer;
+    const toast=(message,error=false)=>{const el=$("toast");el.textContent=message;el.style.borderColor=error?"var(--red)":"var(--lime)";el.classList.remove("hidden");clearTimeout(timer);timer=setTimeout(()=>el.classList.add("hidden"),4500)};
+    async function api(path,options={}){const r=await fetch(path,{credentials:"same-origin",...options});if(r.status===401)throw new Error("AUTH");if(!r.ok)throw new Error((await r.text())||"HTTP "+r.status);return r.status===204?null:r.json()}
+    function stateClass(value,online){if(!online)return"offline";if(["ERROR","BLOCKED","GPS_UNAVAILABLE"].includes(value))return"error";if(["WORKING","MINING","BUILDING","MOVING","RETURNING","EXPLORING"].includes(value))return"working";return""}
+    function render(){
+      const agents=data.agents||[], tasks=data.tasks||[];
+      $("total").textContent=agents.length;$("online").textContent=agents.filter(a=>a.online).length;$("working").textContent=agents.filter(a=>a.online&&a.current_task_id).length;$("tasks-open").textContent=tasks.filter(t=>["QUEUED","RUNNING","PAUSED","BLOCKED"].includes(t.state)).length;
+      $("selected-count").textContent=selected.size+" selecionada"+(selected.size===1?"":"s");
+      for(const id of [...selected]) if(!agents.find(a=>a.id===id&&a.online)) selected.delete(id);
+      $("agent-select").innerHTML=agents.length?agents.map(a=>{const capable=(a.capabilities||[]).includes("move");return `<label class="agent-option"><input type="checkbox" value="${esc(a.id)}" ${selected.has(a.id)?"checked":""} ${!a.online||!capable?"disabled":""}><span><strong>${esc(a.name)}</strong><small>#${esc(a.computer_id)} · ${!a.online?"offline":capable?"online":"legado · atualize o agente"}</small></span><span class="state ${stateClass(a.state,a.online)} status">${esc(a.online?a.state:"OFFLINE")}</span></label>`}).join(""):'<div class="item">Nenhuma Turtle cadastrada.</div>';
+      $("agents").innerHTML=agents.length?agents.map(a=>`<article class="agent"><div class="agent-top"><div class="agent-name">${esc(a.name)} <small>#${esc(a.computer_id)}</small></div><span class="state ${stateClass(a.state,a.online)}">${esc(a.online?a.state:"OFFLINE")}</span></div><div class="kv"><span>Posição</span><b>${esc(a.x)}, ${esc(a.y)}, ${esc(a.z)}</b><span>Dimensão</span><b>${esc(a.dimension)}</b><span>Direção</span><b>${esc(a.heading)}</b><span>Fuel</span><b>${esc(a.fuel)}</b></div><details><summary>Inventário e capacidades</summary><pre>${esc(JSON.stringify({inventário:a.inventory,capacidades:a.capabilities,base:a.base},null,2))}</pre></details></article>`).join(""):'<div class="item">Nenhuma Turtle cadastrada.</div>';
+      $("tasks").innerHTML=tasks.length?tasks.slice(0,40).map(t=>`<article class="item ${t.state==="FAILED"?"error":t.state==="BLOCKED"?"warn":""}"><strong>${esc(t.title)}</strong><small>${esc(t.kind)} · ${esc(t.state)} · ${esc(t.assigned_agent_id||"coordenação")}</small><div class="progress"><i style="width:${Math.max(0,Math.min(100,t.progress))}%"></i></div><small>${esc(t.progress)}% ${esc(t.message||"")}</small></article>`).join(""):'<div class="item">Nenhuma tarefa ainda.</div>';
+      $("logs").innerHTML=(data.logs||[]).length?data.logs.slice(0,80).map(l=>`<article class="item ${l.level==="ERROR"?"error":l.level==="WARN"?"warn":""}"><strong>${esc(l.level)} · ${esc(l.message)}</strong><small>${esc(l.agent_id||"coordenação")} · ${new Date(l.created_at*1000).toLocaleString()}</small></article>`).join(""):'<div class="item">Sem eventos recentes.</div>';
+      renderMap(agents,data.players||[]);
+    }
+    function renderMap(agents,players){const bases=agents.filter(a=>a.base?.x!=null&&a.base?.z!=null).map(a=>({name:"Base",kind:"base",x:a.base.x,y:a.base.y,z:a.base.z}));const points=[...agents.filter(a=>a.x!=null&&a.z!=null),...players.filter(p=>p.x!=null&&p.z!=null),...bases];$("map-empty").classList.toggle("hidden",points.length>0);for(const node of [...$("map").querySelectorAll(".pin")])node.remove();if(!points.length)return;const xs=points.map(p=>p.x),zs=points.map(p=>p.z),minX=Math.min(...xs),maxX=Math.max(...xs),minZ=Math.min(...zs),maxZ=Math.max(...zs),span=Math.max(maxX-minX,maxZ-minZ,20);for(const point of points){const isBase=point.kind==="base",isPlayer=!isBase&&"name"in point&&!('computer_id'in point),left=12+76*(point.x-minX)/span,top=88-76*(point.z-minZ)/span,b=document.createElement("button");b.className="pin "+(isBase?"base":isPlayer?"player":point.online?"":"offline");b.style.left=left+"%";b.style.top=top+"%";b.title=isPlayer?`Jogador ${point.name}: ${point.x}, ${point.y}, ${point.z}`:`${point.name}: ${point.x}, ${point.y}, ${point.z}`;b.setAttribute("aria-label",b.title);$("map").append(b)}}
+    async function refresh(){try{data=await api("/api/dashboard");$("dot").classList.add("ok");$("connection").textContent="Conectado";render()}catch(e){if(e.message==="AUTH")return $("login").classList.remove("hidden");$("dot").classList.remove("ok");$("connection").textContent="Sem conexão";console.error(e)}}
+    function connect(){if(socket)socket.close();const scheme=location.protocol==="https:"?"wss":"ws";socket=new WebSocket(`${scheme}://${location.host}/ws/dashboard`);socket.onopen=()=>{socket.send("ready");$("dot").classList.add("ok");$("connection").textContent="Tempo real"};socket.onmessage=()=>refresh();socket.onclose=()=>setTimeout(connect,3000)}
+    $("login-form").addEventListener("submit",async e=>{e.preventDefault();$("login-error").textContent="";try{await api("/api/auth/login",{method:"POST",headers:{"X-Web-Password":$("password").value}});$("password").value="";$("login").classList.add("hidden");await refresh();connect()}catch(e){$("login-error").textContent="Senha inválida ou servidor indisponível."}});
+    $("agent-select").addEventListener("change",e=>{if(!e.target.matches("input"))return;e.target.checked?selected.add(e.target.value):selected.delete(e.target.value);render()});
+    $("task-form").addEventListener("submit",async e=>{e.preventDefault();const button=$("send");button.disabled=true;try{const result=await api("/api/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:$("prompt").value,agent_ids:[...selected]})});$("prompt").value="";toast(`Tarefa criada para ${result.agent_ids.length} Turtle(s): ${result.title}`);await refresh()}catch(e){toast(e.message==="AUTH"?"Sessão expirada.":"Não foi possível criar a tarefa: "+e.message,true)}finally{button.disabled=false}});
+    (async()=>{try{data=await api("/api/dashboard");$("login").classList.add("hidden");render();connect()}catch(e){if(e.message!=="AUTH")toast("Servidor indisponível.",true)}})();
+  </script>
 </body>
 </html>

@@ -1,452 +1,335 @@
+"""CC Fleet OS - API, task coordinator and real-time dashboard."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
 import secrets
+import sqlite3
 import time
-from collections import Counter, deque
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
-import requests
-from fastapi import FastAPI, Header, HTTPException, Request, Form, Response
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import Cookie, FastAPI, Header, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 BASE = Path(__file__).resolve().parent
+ROOT = BASE.parent
 DATA = BASE / "data"
-PLANS = DATA / "plans"
 DATA.mkdir(exist_ok=True)
-PLANS.mkdir(exist_ok=True)
+DB = DATA / "fleet.db"
+WEB_PASSWORD = os.getenv("WEB_PASSWORD")
+ENROLLMENT_TOKEN = os.getenv("FLEET_ENROLLMENT_TOKEN", os.getenv("FLEET_TOKEN"))
+PLAYER_BEACON_TOKEN = os.getenv("PLAYER_BEACON_TOKEN", ENROLLMENT_TOKEN)
+OFFLINE_AFTER = int(os.getenv("OFFLINE_AFTER_SECONDS", "20"))
+if not WEB_PASSWORD or WEB_PASSWORD == "CHANGE-ME":
+    raise RuntimeError("Defina WEB_PASSWORD com uma senha forte antes de iniciar o servidor.")
+if not ENROLLMENT_TOKEN or ENROLLMENT_TOKEN == "CHANGE-ME":
+    raise RuntimeError("Defina FLEET_ENROLLMENT_TOKEN com um token forte antes de iniciar o servidor.")
+if not PLAYER_BEACON_TOKEN or PLAYER_BEACON_TOKEN == "CHANGE-ME" or PLAYER_BEACON_TOKEN == ENROLLMENT_TOKEN:
+    raise RuntimeError("Defina PLAYER_BEACON_TOKEN diferente do token de cadastro.")
 
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:4b")
-FLEET_TOKEN = os.getenv("FLEET_TOKEN", "CHANGE-ME")
-WEB_PASSWORD = os.getenv("WEB_PASSWORD", "CHANGE-ME")
-
-app = FastAPI(title="CC Fleet AI v2")
+app = FastAPI(title="CC Fleet OS", version="3.0.1")
 templates = Jinja2Templates(directory=str(BASE / "templates"))
-commands: deque[dict[str, Any]] = deque()
-command_results: dict[str, dict[str, Any]] = {}
-fleet_status: dict[str, dict[str, Any]] = {}
-events: deque[dict[str, Any]] = deque(maxlen=200)
+app.mount("/agent", StaticFiles(directory=str(ROOT / "turtle")), name="agent")
 
 
-class Origin(BaseModel):
-    x: int
-    y: int
-    z: int
+@contextmanager
+def db():
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+    try:
+        yield con
+        con.commit()
+    finally:
+        con.close()
 
 
-class PlanRequest(BaseModel):
-    prompt: str = Field(min_length=3, max_length=1000)
-    origin: Origin
+def now() -> int:
+    return int(time.time())
 
 
-class CommandRequest(BaseModel):
-    controller_id: int
-    turtle_id: int
-    command: str
-    plan_id: str | None = None
-    x: int | None = None
-    y: int | None = None
-    z: int | None = None
-    length: int | None = None
-    width: int | None = None
-    depth: int | None = None
-    height: int | None = None
-    dig: bool = False
+def dumps(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
 
-class StatusRequest(BaseModel):
+def loads(value: str | None, default: Any) -> Any:
+    try:
+        return json.loads(value or "")
+    except (TypeError, json.JSONDecodeError):
+        return default
+
+
+def init_db():
+    with db() as con:
+        con.executescript("""
+        CREATE TABLE IF NOT EXISTS agents (
+          id TEXT PRIMARY KEY, computer_id INTEGER, name TEXT NOT NULL,
+          token_hash TEXT NOT NULL, dimension TEXT NOT NULL DEFAULT 'minecraft:overworld',
+          heading TEXT NOT NULL DEFAULT 'unknown', state TEXT NOT NULL DEFAULT 'OFFLINE',
+          x REAL, y REAL, z REAL, fuel TEXT, inventory TEXT NOT NULL DEFAULT '{}',
+          capabilities TEXT NOT NULL DEFAULT '[]', current_task_id TEXT,
+          base TEXT NOT NULL DEFAULT '{}', last_seen INTEGER NOT NULL, created_at INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS tasks (
+          id TEXT PRIMARY KEY, parent_id TEXT, title TEXT NOT NULL, kind TEXT NOT NULL,
+          payload TEXT NOT NULL, state TEXT NOT NULL, assigned_agent_id TEXT,
+          progress INTEGER NOT NULL DEFAULT 0, message TEXT, checkpoint TEXT NOT NULL DEFAULT '{}',
+          created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, completed_at INTEGER
+        );
+        CREATE TABLE IF NOT EXISTS logs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT, agent_id TEXT, task_id TEXT,
+          level TEXT NOT NULL, message TEXT NOT NULL, data TEXT NOT NULL DEFAULT '{}', created_at INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS players (
+          name TEXT PRIMARY KEY, x REAL NOT NULL, y REAL NOT NULL, z REAL NOT NULL,
+          dimension TEXT NOT NULL DEFAULT 'minecraft:overworld', updated_at INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS sessions (
+          id TEXT PRIMARY KEY, expires_at INTEGER NOT NULL
+        );
+        """)
+
+
+init_db()
+
+
+class Hub:
+    def __init__(self):
+        self.clients: set[WebSocket] = set()
+
+    async def publish(self, event: str, data: dict[str, Any]):
+        message = dumps({"event": event, "data": data, "at": now()})
+        for client in list(self.clients):
+            try:
+                await client.send_text(message)
+            except Exception:
+                self.clients.discard(client)
+
+
+hub = Hub()
+
+
+def log(agent_id: str | None, level: str, message: str, task_id: str | None = None, data: dict[str, Any] | None = None):
+    with db() as con:
+        con.execute(
+            "INSERT INTO logs(agent_id,task_id,level,message,data,created_at) VALUES(?,?,?,?,?,?)",
+            (agent_id, task_id, level, message[:500], dumps(data or {}), now()),
+        )
+
+
+def agent_row(row: sqlite3.Row) -> dict[str, Any]:
+    item = dict(row)
+    item["inventory"] = loads(item.pop("inventory"), {})
+    item["capabilities"] = loads(item.pop("capabilities"), [])
+    item["base"] = loads(item.pop("base"), {})
+    item["online"] = now() - item["last_seen"] <= OFFLINE_AFTER
+    if not item["online"]:
+        item["state"] = "OFFLINE"
+    return item
+
+
+def task_row(row: sqlite3.Row) -> dict[str, Any]:
+    item = dict(row)
+    item["payload"] = loads(item["payload"], {})
+    item["checkpoint"] = loads(item["checkpoint"], {})
+    return item
+
+
+def require_web(session_id: str | None):
+    if not session_id:
+        raise HTTPException(401, "autenticação necessária")
+    with db() as con:
+        valid = con.execute("SELECT 1 FROM sessions WHERE id=? AND expires_at>?", (session_id, now())).fetchone()
+    if not valid:
+        raise HTTPException(401, "sessão expirada")
+
+
+def require_agent(agent_id: str, token: str | None):
+    if not token:
+        raise HTTPException(401, "token do agente ausente")
+    with db() as con:
+        row = con.execute("SELECT token_hash FROM agents WHERE id=?", (agent_id,)).fetchone()
+    if not row or not secrets.compare_digest(row["token_hash"], hashlib.sha256(token.encode()).hexdigest()):
+        raise HTTPException(401, "token do agente inválido")
+
+
+class Register(BaseModel):
+    computer_id: int
+    name: str = Field(min_length=1, max_length=64)
+    dimension: str = "minecraft:overworld"
+    capabilities: list[str] = Field(default_factory=list)
+    base: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("base", mode="before")
+    @classmethod
+    def empty_base(cls, value: Any):
+        return {} if value == [] else value
+
+
+class Heartbeat(BaseModel):
+    state: str = "IDLE"
+    x: float | None = None
+    y: float | None = None
+    z: float | None = None
+    dimension: str = "minecraft:overworld"
+    heading: Literal["north", "east", "south", "west", "unknown"] = "unknown"
+    fuel: int | str | None = None
+    inventory: dict[str, int] = Field(default_factory=dict)
+    current_task_id: str | None = None
+    capabilities: list[str] = Field(default_factory=list)
+    base: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("inventory", mode="before")
+    @classmethod
+    def lua_empty_table(cls, value: Any):
+        return {} if value == [] else value
+
+    @field_validator("base", mode="before")
+    @classmethod
+    def lua_empty_base(cls, value: Any):
+        return {} if value == [] else value
+
+
+class TaskCreate(BaseModel):
+    prompt: str = Field(min_length=3, max_length=500)
+    agent_ids: list[str] = Field(default_factory=list)
+    origin: dict[str, float] | None = None
+
+
+class Progress(BaseModel):
+    state: Literal["RUNNING", "PAUSED", "DONE", "FAILED", "BLOCKED"]
+    progress: int = Field(ge=0, le=100)
+    message: str = Field(max_length=500)
+    checkpoint: dict[str, Any] = Field(default_factory=dict)
+    log_level: Literal["INFO", "WARN", "ERROR"] = "INFO"
+
+    @field_validator("checkpoint", mode="before")
+    @classmethod
+    def lua_empty_checkpoint(cls, value: Any):
+        return {} if value == [] else value
+
+
+class PlayerLocation(BaseModel):
+    name: str = Field(min_length=1, max_length=64)
+    x: float
+    y: float
+    z: float
+    dimension: str = "minecraft:overworld"
+
+
+class LegacyStatus(BaseModel):
     controller_id: int
     turtle_id: int
     name: str | None = None
     label: str | None = None
-    state: str | None = None
-    x: int | float | None = None
-    y: int | float | None = None
-    z: int | float | None = None
-    fuel: int | float | str | None = None
-    # CC:Tweaked pode serializar uma tabela Lua vazia como [] em vez de {}.
-    # Aceitamos Any aqui e normalizamos no endpoint.
-    inventory: Any = Field(default_factory=dict)
+    state: str = "IDLE"
+    x: float | None = None
+    y: float | None = None
+    z: float | None = None
+    fuel: int | str | None = None
+    inventory: dict[str, int] = Field(default_factory=dict)
     extra: Any = Field(default_factory=dict)
-    timestamp: int | float | None = None
+    timestamp: int | None = None
+
+    @field_validator("inventory", mode="before")
+    @classmethod
+    def legacy_empty_inventory(cls, value: Any):
+        return {} if value == [] else value
 
 
-def require_fleet_token(x_fleet_token: str | None):
-    if not secrets.compare_digest(x_fleet_token or "", FLEET_TOKEN):
-        raise HTTPException(status_code=401, detail="invalid fleet token")
+def parse_task(prompt: str, origin: dict[str, float] | None) -> tuple[str, str, dict[str, Any]]:
+    text = prompt.strip()
+    lower = text.lower()
+    numbers = [int(value) for value in re.findall(r"(\d+)", lower)]
+    if re.search(r"venha|vá?i? até mim|vá até mim|siga[- ]?me|me encontre", lower):
+        return "follow_player", "Encontrar o jogador", {"player": None, "recalculate_seconds": 4, "dig": True}
+    if "volte" in lower and ("base" in lower or "casa" in lower):
+        return "return_base", "Retornar à base", {}
+    if "parede" in lower:
+        length, height = (numbers + [10, 3])[:2]
+        if not 1 <= length <= 128 or not 1 <= height <= 32:
+            raise HTTPException(422, "Parede limitada a 128 blocos de comprimento e 32 de altura.")
+        material = "minecraft:stone" if "pedra" in lower else "minecraft:oak_planks"
+        return "build_wall", f"Construir parede {length}x{height}", {"length": length, "height": height, "material": material, "origin": origin}
+    if "casa" in lower:
+        width, depth = (numbers + [11, 9])[:2]
+        if not 3 <= width <= 64 or not 3 <= depth <= 64:
+            raise HTTPException(422, "Casa limitada a dimensões entre 3 e 64 blocos.")
+        material = "minecraft:oak_planks" if ("carvalho" in lower or "madeira" in lower) else "minecraft:cobblestone"
+        return "build_house", f"Construir casa {width}x{depth}", {"width": width, "depth": depth, "material": material, "origin": origin}
+    if "ponte" in lower:
+        length = (numbers + [16])[0]
+        if not 1 <= length <= 128:
+            raise HTTPException(422, "Ponte limitada a 128 blocos.")
+        return "build_bridge", f"Construir ponte de {length} blocos", {"length": length, "material": "minecraft:oak_planks", "origin": origin}
+    if any(word in lower for word in ("mine", "minere", "minerar", "diamante")):
+        width, depth = (numbers + [16, 16])[:2]
+        if not 1 <= width <= 128 or not 1 <= depth <= 128:
+            raise HTTPException(422, "Área limitada a 128 por 128 blocos.")
+        return "mine_area", f"Minerar área {width}x{depth}", {"width": width, "depth": depth, "height": 2, "seek_diamond": "diamante" in lower, "origin": origin}
+    if any(word in lower for word in ("quebre", "limpe", "escave", "remova")):
+        width, depth = (numbers + [8, 8])[:2]
+        if not 1 <= width <= 128 or not 1 <= depth <= 128:
+            raise HTTPException(422, "Área limitada a 128 por 128 blocos.")
+        return "clear_area", f"Limpar área {width}x{depth}", {"width": width, "depth": depth, "height": 2, "origin": origin}
+    if "vá" in lower or "ir " in lower:
+        coords = re.findall(r"[-+]?\d+(?:\.\d+)?", text)
+        if len(coords) >= 3:
+            return "goto", "Navegar até coordenadas", {"x": float(coords[-3]), "y": float(coords[-2]), "z": float(coords[-1]), "dig": True}
+    raise HTTPException(422, "Não entendi a tarefa. Use: venha até mim, mine 20x20, parede 30x10, casa 20x20, ponte 15, limpe 10x10 ou vá para X Y Z.")
 
 
-def web_auth(password: str):
-    if not secrets.compare_digest(password, WEB_PASSWORD):
-        raise HTTPException(status_code=401, detail="senha web incorreta")
+def choose_agents(requested: list[str], needed: int) -> list[dict[str, Any]]:
+    with db() as con:
+        rows = [agent_row(row) for row in con.execute("SELECT * FROM agents").fetchall()]
+    available = [item for item in rows if item["online"] and not item["current_task_id"]
+                 and "move" in item["capabilities"]]
+    if requested:
+        allowed = set(requested)
+        available = [item for item in available if item["id"] in allowed]
+    return sorted(available, key=lambda item: (item["fuel"] in (None, 0, "0"), item["id"]))[:needed]
 
 
-def push_event(kind: str, payload: dict[str, Any]):
-    events.appendleft({"kind": kind, **payload})
-
-
-ALLOWED = {
-    "wall": [
-        "minecraft:oak_planks", "minecraft:spruce_planks", "minecraft:birch_planks",
-        "minecraft:stone_bricks", "minecraft:bricks", "minecraft:cobblestone"
-    ],
-    "floor": [
-        "minecraft:oak_planks", "minecraft:spruce_planks", "minecraft:birch_planks",
-        "minecraft:stone_bricks"
-    ],
-    "roof": [
-        "minecraft:spruce_planks", "minecraft:oak_planks", "minecraft:stone_bricks",
-        "minecraft:cobblestone"
-    ],
-    "window": ["minecraft:glass"],
-    "door": ["minecraft:oak_door", "minecraft:spruce_door"],
-}
-
-
-def _extract_json(text: str) -> dict[str, Any]:
-    try:
-        return json.loads(text)
-    except Exception:
-        m = re.search(r"\{.*\}", text, re.S)
-        if not m:
-            raise ValueError("A IA nao retornou JSON.")
-        return json.loads(m.group(0))
-
-
-def choose(value: str | None, category: str, default: str) -> str:
-    return value if value in ALLOWED[category] else default
-
-
-def sanitize_spec(s: dict[str, Any]) -> dict[str, Any]:
-    m = s.get("materials") or {}
-    f = s.get("features") or {}
-    style = str(s.get("style", "simple")).lower()
-    if style not in {"simple", "modern", "medieval"}:
-        style = "simple"
-    width = max(7, min(25, int(s.get("width", 11))))
-    depth = max(7, min(25, int(s.get("depth", 9))))
-    if width % 2 == 0:
-        width += 1
-    if depth % 2 == 0:
-        depth += 1
-    return {
-        "name": str(s.get("name", "Casa IA"))[:60],
-        "style": style,
-        "width": width,
-        "depth": depth,
-        "floors": max(1, min(3, int(s.get("floors", 1)))),
-        "floor_height": max(3, min(5, int(s.get("floor_height", 4)))),
-        "materials": {
-            "wall": choose(m.get("wall"), "wall", "minecraft:oak_planks"),
-            "floor": choose(m.get("floor"), "floor", "minecraft:oak_planks"),
-            "roof": choose(m.get("roof"), "roof", "minecraft:spruce_planks"),
-            "window": "minecraft:glass",
-            "door": choose(m.get("door"), "door", "minecraft:oak_door"),
-        },
-        "features": {
-            "windows": bool(f.get("windows", True)),
-            "door": bool(f.get("door", True)),
-            "roof": bool(f.get("roof", True)),
-            "interior_floor": bool(f.get("interior_floor", True)),
-        },
-    }
-
-
-def ai_spec(prompt: str) -> dict[str, Any]:
-    system = """
-Voce e um arquiteto para Minecraft/CC:Tweaked.
-Converta o pedido em JSON, sem texto extra.
-Nao gere coordenadas de blocos. Gere apenas parametros.
-Schema:
-{
-  "name": "nome curto",
-  "style": "simple|modern|medieval",
-  "width": inteiro 7..25,
-  "depth": inteiro 7..25,
-  "floors": inteiro 1..3,
-  "floor_height": inteiro 3..5,
-  "materials": {
-    "wall": "minecraft:...",
-    "floor": "minecraft:...",
-    "roof": "minecraft:...",
-    "window": "minecraft:glass",
-    "door": "minecraft:oak_door"
-  },
-  "features": {
-    "windows": true,
-    "door": true,
-    "roof": true,
-    "interior_floor": true
-  }
-}
-Use somente materiais vanilla comuns.
-"""
-    payload = {
-        "model": OLLAMA_MODEL,
-        "stream": False,
-        "format": "json",
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user", "content": prompt},
-        ],
-        "options": {"temperature": 0.2},
-    }
-    r = requests.post(OLLAMA_URL, json=payload, timeout=120)
-    r.raise_for_status()
-    data = r.json()
-    content = data.get("message", {}).get("content", "{}")
-    spec = _extract_json(content)
-    return sanitize_spec(spec)
-
-
-def add(out, seen, x, y, z, block):
-    key = (x, y, z)
-    if key in seen:
-        idx = seen[key]
-        out[idx] = {"x": x, "y": y, "z": z, "block": block}
-    else:
-        seen[key] = len(out)
-        out.append({"x": x, "y": y, "z": z, "block": block})
-
-
-def remove_at(out, seen, x, y, z):
-    key = (x, y, z)
-    if key not in seen:
-        return
-    idx = seen.pop(key)
-    out[idx] = None
-
-
-def generate_blueprint(spec: dict[str, Any]) -> list[dict[str, Any]]:
-    w, d = spec["width"], spec["depth"]
-    floors, fh = spec["floors"], spec["floor_height"]
-    mat = spec["materials"]
-    feat = spec["features"]
-    out: list[dict[str, Any] | None] = []
-    seen: dict[tuple[int, int, int], int] = {}
-
-    for floor in range(floors):
-        base_y = floor * fh
-        if floor == 0 or feat["interior_floor"]:
-            for x in range(w):
-                for z in range(d):
-                    add(out, seen, x, base_y, z, mat["floor"])
-        for yy in range(base_y + 1, base_y + fh):
-            for x in range(w):
-                add(out, seen, x, yy, 0, mat["wall"])
-                add(out, seen, x, yy, d - 1, mat["wall"])
-            for z in range(1, d - 1):
-                add(out, seen, 0, yy, z, mat["wall"])
-                add(out, seen, w - 1, yy, z, mat["wall"])
-        if floor == 0 and feat["door"]:
-            cx = w // 2
-            remove_at(out, seen, cx, base_y + 1, 0)
-            remove_at(out, seen, cx, base_y + 2, 0)
-        if feat["windows"]:
-            wy = base_y + 2
-            for x in range(2, w - 2, max(3, (w - 4)//2 or 3)):
-                if not (floor == 0 and x == w // 2):
-                    add(out, seen, x, wy, 0, mat["window"])
-                    add(out, seen, x, wy, d - 1, mat["window"])
-            for z in range(2, d - 2, max(3, (d - 4)//2 or 3)):
-                add(out, seen, 0, wy, z, mat["window"])
-                add(out, seen, w - 1, wy, z, mat["window"])
-
-    top = floors * fh
-    if feat["roof"]:
-        if spec["style"] == "modern":
-            for x in range(w):
-                for z in range(d):
-                    add(out, seen, x, top, z, mat["roof"])
-        else:
-            max_inset = min(w, d) // 2
-            for inset in range(max_inset + 1):
-                x0, x1 = inset, w - 1 - inset
-                z0, z1 = inset, d - 1 - inset
-                if x0 > x1 or z0 > z1:
-                    break
-                yy = top + inset
-                for x in range(x0, x1 + 1):
-                    add(out, seen, x, yy, z0, mat["roof"])
-                    add(out, seen, x, yy, z1, mat["roof"])
-                for z in range(z0 + 1, z1):
-                    add(out, seen, x0, yy, z, mat["roof"])
-                    add(out, seen, x1, yy, z, mat["roof"])
-    else:
-        for x in range(w):
-            for z in range(d):
-                add(out, seen, x, top, z, mat["roof"])
-
-    clean = [p for p in out if p is not None]
-    clean.sort(key=lambda p: (p["y"], p["z"], p["x"]))
-    return clean
-
-
-def create_plan(prompt: str, origin: dict[str, int]) -> dict[str, Any]:
-    spec = ai_spec(prompt)
-    placements = generate_blueprint(spec)
-    plan_id = secrets.token_hex(4)
-    materials = Counter(p["block"] for p in placements)
-    plan = {
-        "id": plan_id,
-        "prompt": prompt,
-        "origin": origin,
-        "spec": spec,
-        "materials": dict(materials),
-        "placements": placements,
-    }
-    (PLANS / f"{plan_id}.json").write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
-    push_event("plan_created", {"plan_id": plan_id, "origin": origin, "prompt": prompt})
-    return plan
+def create_task(prompt: str, requested_agents: list[str], origin: dict[str, float] | None) -> dict[str, Any]:
+    kind, title, payload = parse_task(prompt, origin)
+    if len(requested_agents) > 1 and kind not in {"mine_area", "clear_area"}:
+        raise HTTPException(422, "Distribuição em equipe está disponível para mineração e limpeza de áreas. Escolha uma Turtle para esta tarefa.")
+    collaboration = kind in {"mine_area", "clear_area"} and len(requested_agents) != 1
+    wanted = len(requested_agents) if requested_agents else (4 if collaboration else 1)
+    agents = choose_agents(requested_agents, wanted)
+    if not agents:
+        raise HTTPException(409, "Nenhuma Turtle online e disponível foi encontrada.")
+    if payload.get("origin") is None and agents[0].get("x") is not None:
+        payload["origin"] = {"x": agents[0]["x"], "y": agents[0]["y"], "z": agents[0]["z"]}
+    if collaboration and payload.get("origin") is None:
+        raise HTTPException(409, "A tarefa em equipe precisa de uma posição GPS válida na primeira Turtle selecionada.")
+    parent_id = secrets.token_hex(8)
+    task_ids: list[str] = []
+    with db() as con:
+        if len(agents) > 1:
+            con.execute("INSERT INTO tasks(id,parent_id,title,kind,payload,state,created_at,updated_at) VALUES(?,?,?,?,?,'GROUP',?,?)",
+                        (parent_id, None, title, kind, dumps(payload), now(), now()))
+        for index, agent in enumerate(agents):
+            task_id = secrets.token_hex(8)
+            child = dict(payload)
+            if len(agents) > 1 and kind in {"mine_area", "clear_area"}:
+                child["partition"] = {"index": index, "total": len(agents), "axis": "x"}
+            con.execute("INSERT INTO tasks(id,parent_id,title,kind,payload,state,assigned_agent_id,created_at,updated_at) VALUES(?,?,?,?,?,'QUEUED',?,?,?)",
+                        (task_id, parent_id if len(agents) > 1 else None, title, kind, dumps(child), agent["id"], now(), now()))
+            task_ids.append(task_id)
+    log(None, "INFO", f"Tarefa criada: {title}", parent_id, {"agents": [agent["id"] for agent in agents]})
+    return {"id": parent_id if len(agents) > 1 else task_ids[0], "title": title, "kind": kind, "agent_ids": [agent["id"] for agent in agents], "task_ids": task_ids}
 
 
 @app.get("/health")
 def health():
-    return {"ok": True, "model": OLLAMA_MODEL}
-
-
-@app.post("/api/plan")
-def api_plan(req: PlanRequest, x_fleet_token: str | None = Header(default=None)):
-    require_fleet_token(x_fleet_token)
-    try:
-        return create_plan(req.prompt, req.origin.model_dump())
-    except requests.RequestException as e:
-        raise HTTPException(status_code=502, detail=f"Ollama indisponivel: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.get("/api/plans/{plan_id}")
-def get_plan(plan_id: str, x_fleet_token: str | None = Header(default=None)):
-    require_fleet_token(x_fleet_token)
-    if not re.fullmatch(r"[0-9a-f]{8}", plan_id):
-        raise HTTPException(status_code=400, detail="plan id invalido")
-    p = PLANS / f"{plan_id}.json"
-    if not p.exists():
-        raise HTTPException(status_code=404, detail="plan nao encontrado")
-    return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
-
-
-@app.post("/api/commands")
-def add_command(req: CommandRequest, x_fleet_token: str | None = Header(default=None)):
-    require_fleet_token(x_fleet_token)
-    c = req.model_dump()
-    c["id"] = secrets.token_hex(6)
-    commands.append(c)
-    push_event("command_queued", {"command_id": c["id"], "command": c})
-    return c
-
-
-@app.get("/api/commands/next")
-def next_command(controller_id: int, x_fleet_token: str | None = Header(default=None)):
-    require_fleet_token(x_fleet_token)
-    for _ in range(len(commands)):
-        c = commands.popleft()
-        if c["controller_id"] == controller_id:
-            return c
-        commands.append(c)
-    return Response(status_code=204)
-
-
-@app.post("/api/commands/{command_id}/ack")
-async def ack(command_id: str, request: Request, x_fleet_token: str | None = Header(default=None)):
-    require_fleet_token(x_fleet_token)
-    try:
-        body = await request.json()
-    except Exception:
-        body = {}
-    command_results[command_id] = body
-    push_event("command_ack", {"command_id": command_id, "result": body})
-    return {"ok": True}
-
-
-@app.post("/api/status")
-async def api_status(
-    request: Request,
-    x_fleet_token: str | None = Header(default=None),
-):
-    require_fleet_token(x_fleet_token)
-
-    try:
-        raw = await request.json()
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"JSON invalido: {e}")
-
-    if not isinstance(raw, dict):
-        raise HTTPException(status_code=400, detail="O status precisa ser um objeto JSON.")
-
-    def as_int(value, default=None):
-        if value is None:
-            return default
-        try:
-            return int(float(value))
-        except (TypeError, ValueError):
-            return default
-
-    def as_dict(value):
-        # O CC:Tweaked pode serializar uma tabela Lua vazia como [].
-        if value is None or value == []:
-            return {}
-        if isinstance(value, dict):
-            return value
-        return {"value": value}
-
-    controller_id = as_int(raw.get("controller_id"))
-    turtle_id = as_int(raw.get("turtle_id"))
-
-    if controller_id is None:
-        raise HTTPException(status_code=400, detail="controller_id ausente ou invalido")
-    if turtle_id is None:
-        raise HTTPException(status_code=400, detail="turtle_id ausente ou invalido")
-
-    payload = {
-        "controller_id": controller_id,
-        "turtle_id": turtle_id,
-        "name": str(raw.get("name") or f"turtle-{turtle_id}"),
-        "label": None if raw.get("label") is None else str(raw.get("label")),
-        "state": str(raw.get("state") or "UNKNOWN"),
-        "x": as_int(raw.get("x")),
-        "y": as_int(raw.get("y")),
-        "z": as_int(raw.get("z")),
-        "fuel": raw.get("fuel"),
-        "inventory": as_dict(raw.get("inventory")),
-        "extra": as_dict(raw.get("extra")),
-        "timestamp": as_int(raw.get("timestamp")),
-        "server_received_ms": int(time.time() * 1000),
-    }
-
-    key = f"{controller_id}:{turtle_id}"
-    fleet_status[key] = payload
-    push_event("status", payload)
-
-    return {
-        "ok": True,
-        "controller_id": controller_id,
-        "turtle_id": turtle_id,
-    }
-
-
-@app.get("/api/fleet")
-def api_fleet():
-    items = list(fleet_status.values())
-    items.sort(key=lambda x: (x.get("controller_id", 0), x.get("turtle_id", 0)))
-    return {"fleet": items}
-
-
-@app.get("/api/events")
-def api_events():
-    return {"events": list(events)}
-
-
-@app.get("/api/queue")
-def api_queue():
-    return {"queue": list(commands), "acks": command_results}
+    return {"ok": True, "version": app.version}
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -454,110 +337,226 @@ def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.post("/web/build", response_class=HTMLResponse)
-def web_build(
-    request: Request,
-    password: str = Form(...),
-    controller_id: int = Form(...),
-    turtle_id: int = Form(...),
-    x: int = Form(...),
-    y: int = Form(...),
-    z: int = Form(...),
-    prompt: str = Form(...),
-):
-    web_auth(password)
+@app.post("/api/auth/login")
+def login(request: Request, password: str = Header(default="", alias="X-Web-Password")):
+    if not secrets.compare_digest(password, WEB_PASSWORD):
+        raise HTTPException(401, "senha inválida")
+    session_id = secrets.token_urlsafe(32)
+    with db() as con:
+        con.execute("DELETE FROM sessions WHERE expires_at<?", (now(),))
+        con.execute("INSERT INTO sessions(id,expires_at) VALUES(?,?)", (session_id, now() + 8 * 3600))
+    response = Response(status_code=204)
+    response.set_cookie("ccfleet_session", session_id, max_age=8 * 3600, httponly=True, samesite="strict", secure=request.url.scheme == "https")
+    return response
+
+
+@app.post("/api/status")
+async def legacy_status(body: LegacyStatus, x_fleet_token: str | None = Header(default=None)):
+    """Accept old central-computer heartbeats during migration to the direct agent."""
+    if not secrets.compare_digest(x_fleet_token or "", ENROLLMENT_TOKEN):
+        raise HTTPException(401, "token legado inv\u00e1lido")
+    agent_id = f"cc-{body.turtle_id}"
+    name = (body.name or body.label or f"Turtle {body.turtle_id}")[:64]
+    with db() as con:
+        con.execute("""INSERT INTO agents(id,computer_id,name,token_hash,dimension,heading,state,x,y,z,fuel,
+                       inventory,capabilities,last_seen,created_at)
+                       VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                       ON CONFLICT(id) DO UPDATE SET name=excluded.name,state=excluded.state,
+                       x=excluded.x,y=excluded.y,z=excluded.z,fuel=excluded.fuel,
+                       inventory=excluded.inventory,capabilities=excluded.capabilities,last_seen=excluded.last_seen""",
+                    (agent_id, body.turtle_id, name, "legacy", "minecraft:overworld", "unknown", body.state,
+                     body.x, body.y, body.z, str(body.fuel), dumps(body.inventory),
+                     dumps(["legacy-rednet"]), now(), now()))
+    await hub.publish("agent_heartbeat", {"id": agent_id, "legacy": True})
+    return {"ok": True, "mode": "monitor-only"}
+
+
+@app.get("/api/commands/next")
+def legacy_no_commands(controller_id: int, x_fleet_token: str | None = Header(default=None)):
+    """Legacy central computers poll this endpoint; tasks now go to direct agents."""
+    if not secrets.compare_digest(x_fleet_token or "", ENROLLMENT_TOKEN):
+        raise HTTPException(401, "token legado inv\u00e1lido")
+    return Response(status_code=204)
+
+
+@app.post("/api/auth/logout", status_code=204)
+def logout(ccfleet_session: str | None = Cookie(default=None)):
+    if ccfleet_session:
+        with db() as con:
+            con.execute("DELETE FROM sessions WHERE id=?", (ccfleet_session,))
+    response = Response(status_code=204)
+    response.delete_cookie("ccfleet_session")
+    return response
+
+
+@app.post("/api/agents/register")
+async def register_agent(body: Register, x_enrollment_token: str | None = Header(default=None)):
+    if not secrets.compare_digest(x_enrollment_token or "", ENROLLMENT_TOKEN):
+        raise HTTPException(401, "token de cadastro inválido")
+    agent_id = f"cc-{body.computer_id}"
+    token = secrets.token_urlsafe(32)
+    with db() as con:
+        old = con.execute("SELECT id FROM agents WHERE id=?", (agent_id,)).fetchone()
+        con.execute("""INSERT INTO agents(id,computer_id,name,token_hash,dimension,capabilities,base,last_seen,created_at)
+                       VALUES(?,?,?,?,?,?,?,?,?)
+                       ON CONFLICT(id) DO UPDATE SET name=excluded.name,dimension=excluded.dimension,
+                       capabilities=excluded.capabilities,base=excluded.base,last_seen=excluded.last_seen""",
+                    (agent_id, body.computer_id, body.name, hashlib.sha256(token.encode()).hexdigest(), body.dimension,
+                     dumps(body.capabilities), dumps(body.base), now(), now()))
+        if old:
+            con.execute("UPDATE agents SET token_hash=? WHERE id=?", (hashlib.sha256(token.encode()).hexdigest(), agent_id))
+    log(agent_id, "INFO", "Agente registrado", data={"name": body.name})
+    await hub.publish("agent_registered", {"id": agent_id, "name": body.name})
+    return {"agent_id": agent_id, "agent_token": token, "version": app.version, "poll_seconds": 2}
+
+
+@app.post("/api/agents/{agent_id}/heartbeat")
+async def heartbeat(agent_id: str, body: Heartbeat, x_agent_token: str | None = Header(default=None)):
+    require_agent(agent_id, x_agent_token)
+    with db() as con:
+        con.execute("""UPDATE agents SET state=?,x=?,y=?,z=?,dimension=?,heading=?,fuel=?,inventory=?,
+                       current_task_id=?,capabilities=?,base=?,last_seen=? WHERE id=?""",
+                    (body.state, body.x, body.y, body.z, body.dimension, body.heading, str(body.fuel),
+                     dumps(body.inventory), body.current_task_id, dumps(body.capabilities), dumps(body.base), now(), agent_id))
+    await hub.publish("agent_heartbeat", {"id": agent_id})
+    return {"ok": True}
+
+
+@app.get("/api/agents/{agent_id}/tasks/next")
+def next_task(agent_id: str, x_agent_token: str | None = Header(default=None)):
+    require_agent(agent_id, x_agent_token)
+    with db() as con:
+        row = con.execute("SELECT * FROM tasks WHERE assigned_agent_id=? AND state='QUEUED' ORDER BY created_at LIMIT 1", (agent_id,)).fetchone()
+        if not row:
+            return Response(status_code=204)
+        con.execute("UPDATE tasks SET state='RUNNING',updated_at=? WHERE id=?", (now(), row["id"]))
+        con.execute("UPDATE agents SET current_task_id=?,state='WORKING' WHERE id=?", (row["id"], agent_id))
+    return task_row(row)
+
+
+@app.get("/api/agents/{agent_id}/tasks/{task_id}")
+def get_task(agent_id: str, task_id: str, x_agent_token: str | None = Header(default=None)):
+    require_agent(agent_id, x_agent_token)
+    with db() as con:
+        row = con.execute("SELECT * FROM tasks WHERE id=? AND assigned_agent_id=? AND state IN ('RUNNING','PAUSED','BLOCKED')", (task_id, agent_id)).fetchone()
+    if not row:
+        raise HTTPException(404, "tarefa não encontrada ou já concluída")
+    return task_row(row)
+
+
+@app.post("/api/agents/{agent_id}/tasks/{task_id}/progress")
+async def task_progress(agent_id: str, task_id: str, body: Progress, x_agent_token: str | None = Header(default=None)):
+    require_agent(agent_id, x_agent_token)
+    with db() as con:
+        task = con.execute("SELECT assigned_agent_id FROM tasks WHERE id=?", (task_id,)).fetchone()
+        if not task or task["assigned_agent_id"] != agent_id:
+            raise HTTPException(404, "tarefa não pertence ao agente")
+        completed = now() if body.state in {"DONE", "FAILED"} else None
+        con.execute("UPDATE tasks SET state=?,progress=?,message=?,checkpoint=?,updated_at=?,completed_at=? WHERE id=?",
+                    (body.state, body.progress, body.message, dumps(body.checkpoint), now(), completed, task_id))
+        if body.state in {"DONE", "FAILED", "BLOCKED"}:
+            state = "IDLE" if body.state == "DONE" else ("ERROR" if body.state == "FAILED" else "BLOCKED")
+            con.execute("UPDATE agents SET current_task_id=NULL,state=? WHERE id=?", (state, agent_id))
+    log(agent_id, body.log_level, body.message, task_id, {"progress": body.progress, "checkpoint": body.checkpoint})
+    await hub.publish("task_progress", {"task_id": task_id, "agent_id": agent_id, "state": body.state, "progress": body.progress})
+    return {"ok": True}
+
+
+@app.get("/api/agents/{agent_id}/player-target")
+def player_target(agent_id: str, x_agent_token: str | None = Header(default=None)):
+    require_agent(agent_id, x_agent_token)
+    with db() as con:
+        row = con.execute("SELECT * FROM players ORDER BY updated_at DESC LIMIT 1").fetchone()
+    if not row:
+        raise HTTPException(404, "nenhum beacon de jogador ativo")
+    if now() - row["updated_at"] > 12:
+        raise HTTPException(409, "beacon do jogador está offline; atualize sua posição no Pocket Computer")
+    return dict(row)
+
+
+@app.post("/api/player/location")
+async def player_location(body: PlayerLocation, x_player_token: str | None = Header(default=None)):
+    if not secrets.compare_digest(x_player_token or "", PLAYER_BEACON_TOKEN):
+        raise HTTPException(401, "token do beacon inválido")
+    with db() as con:
+        con.execute("""INSERT INTO players(name,x,y,z,dimension,updated_at) VALUES(?,?,?,?,?,?)
+                       ON CONFLICT(name) DO UPDATE SET x=excluded.x,y=excluded.y,z=excluded.z,
+                       dimension=excluded.dimension,updated_at=excluded.updated_at""",
+                    (body.name, body.x, body.y, body.z, body.dimension, now()))
+    await hub.publish("player_location", body.model_dump())
+    return {"ok": True}
+
+
+@app.get("/api/dashboard")
+def dashboard(ccfleet_session: str | None = Cookie(default=None)):
+    require_web(ccfleet_session)
+    with db() as con:
+        agents = [agent_row(row) for row in con.execute("SELECT * FROM agents ORDER BY name").fetchall()]
+        tasks = [task_row(row) for row in con.execute("SELECT * FROM tasks ORDER BY updated_at DESC LIMIT 100").fetchall()]
+        logs = [dict(row) | {"data": loads(row["data"], {})} for row in con.execute("SELECT * FROM logs ORDER BY id DESC LIMIT 150").fetchall()]
+        players = [dict(row) for row in con.execute("SELECT * FROM players ORDER BY updated_at DESC").fetchall()]
+    return {"agents": agents, "tasks": tasks, "logs": logs, "players": players, "offline_after": OFFLINE_AFTER}
+
+
+@app.post("/api/tasks")
+async def add_task(body: TaskCreate, ccfleet_session: str | None = Cookie(default=None)):
+    require_web(ccfleet_session)
+    task = create_task(body.prompt, body.agent_ids, body.origin)
+    await hub.publish("task_created", task)
+    return task
+
+
+@app.get("/api/tasks")
+def list_tasks(ccfleet_session: str | None = Cookie(default=None)):
+    require_web(ccfleet_session)
+    with db() as con:
+        return {"tasks": [task_row(row) for row in con.execute("SELECT * FROM tasks ORDER BY updated_at DESC LIMIT 100").fetchall()]}
+
+
+@app.websocket("/ws/dashboard")
+async def dashboard_ws(websocket: WebSocket):
+    session_id = websocket.cookies.get("ccfleet_session")
     try:
-        plan = create_plan(prompt, {"x": x, "y": y, "z": z})
-        cmd = {
-            "id": secrets.token_hex(6),
-            "controller_id": controller_id,
-            "turtle_id": turtle_id,
-            "command": "build",
-            "plan_id": plan["id"],
-        }
-        commands.append(cmd)
-        push_event("web_build", {"command": cmd})
-        result = {
-            "title": "Comando de construcao criado",
-            "plan_id": plan["id"],
-            "spec": plan["spec"],
-            "materials": plan["materials"],
-            "blocks": len(plan["placements"]),
-            "turtle_id": turtle_id,
-        }
-        return templates.TemplateResponse("index.html", {"request": request, "result": result})
-    except Exception as e:
-        return templates.TemplateResponse("index.html", {"request": request, "error": str(e)})
+        require_web(session_id)
+    except HTTPException:
+        await websocket.close(code=4401)
+        return
+    await websocket.accept()
+    hub.clients.add(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        hub.clients.discard(websocket)
 
 
-@app.post("/web/goto", response_class=HTMLResponse)
-def web_goto(
-    request: Request,
-    password: str = Form(...),
-    controller_id: int = Form(...),
-    turtle_id: int = Form(...),
-    x: int = Form(...),
-    y: int = Form(...),
-    z: int = Form(...),
-    dig: str | None = Form(default=None),
-):
-    web_auth(password)
-    cmd = {
-        "id": secrets.token_hex(6),
-        "controller_id": controller_id,
-        "turtle_id": turtle_id,
-        "command": "goto",
-        "x": x, "y": y, "z": z,
-        "dig": bool(dig),
-    }
-    commands.append(cmd)
-    push_event("web_goto", {"command": cmd})
-    return templates.TemplateResponse("index.html", {"request": request, "result": {"title": "Comando de navegacao criado", "command": cmd}})
+@app.get("/bootstrap/install.lua", response_class=Response)
+def bootstrap_script(request: Request):
+    content = (ROOT / "bootstrap" / "install.lua").read_text(encoding="utf-8")
+    return Response(content, media_type="text/plain; charset=utf-8")
 
 
-@app.post("/web/dig", response_class=HTMLResponse)
-def web_dig(
-    request: Request,
-    password: str = Form(...),
-    controller_id: int = Form(...),
-    turtle_id: int = Form(...),
-    length: int = Form(...),
-    height: int = Form(default=2),
-):
-    web_auth(password)
-    cmd = {
-        "id": secrets.token_hex(6),
-        "controller_id": controller_id,
-        "turtle_id": turtle_id,
-        "command": "dig_line",
-        "length": length,
-        "height": height,
-    }
-    commands.append(cmd)
-    push_event("web_dig", {"command": cmd})
-    return templates.TemplateResponse("index.html", {"request": request, "result": {"title": "Comando de escavacao linear criado", "command": cmd}})
+@app.get("/bootstrap/beacon.lua", response_class=Response)
+def beacon_script():
+    content = (ROOT / "pocket" / "beacon.lua").read_text(encoding="utf-8")
+    return Response(content, media_type="text/plain; charset=utf-8")
 
 
-@app.post("/web/quarry", response_class=HTMLResponse)
-def web_quarry(
-    request: Request,
-    password: str = Form(...),
-    controller_id: int = Form(...),
-    turtle_id: int = Form(...),
-    width: int = Form(...),
-    depth: int = Form(...),
-    height: int = Form(default=2),
-):
-    web_auth(password)
-    cmd = {
-        "id": secrets.token_hex(6),
-        "controller_id": controller_id,
-        "turtle_id": turtle_id,
-        "command": "quarry",
-        "width": width,
-        "depth": depth,
-        "height": height,
-    }
-    commands.append(cmd)
-    push_event("web_quarry", {"command": cmd})
-    return templates.TemplateResponse("index.html", {"request": request, "result": {"title": "Comando de quarry criado", "command": cmd}})
+@app.get("/api/agent/manifest")
+def agent_manifest(agent_id: str, x_agent_token: str | None = Header(default=None)):
+    require_agent(agent_id, x_agent_token)
+    files = []
+    agent_files = [
+        "agent.lua", "startup.lua", "lib/state.lua", "lib/net.lua", "lib/gps.lua",
+        "lib/movement.lua", "lib/navigation.lua", "lib/inventory.lua", "lib/fuel.lua",
+        "lib/tasks.lua", "lib/mining.lua", "lib/building.lua", "lib/update.lua",
+    ]
+    for relative in agent_files:
+        path = ROOT / "turtle" / relative
+        files.append({"path": relative})
+    return {"version": app.version, "files": files}
+
+
+@app.get("/api/bootstrap/health")
+def bootstrap_health():
+    return {"version": app.version, "agent_url": "/agent/"}

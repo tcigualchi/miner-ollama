@@ -1,1 +1,1 @@
-shell.run("worker")
+shell.run("/fleet/agent.lua")

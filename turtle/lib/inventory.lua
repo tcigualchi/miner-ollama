@@ -1,42 +1,18 @@
 local M = {}
-
-function M.find(itemName)
-  for slot = 1, 16 do
-    local detail = turtle.getItemDetail(slot)
-    if detail and detail.name == itemName and turtle.getItemCount(slot) > 0 then
-      return slot
-    end
-  end
-  return nil
-end
-
-function M.count(itemName)
-  local n = 0
-  for slot = 1, 16 do
-    local detail = turtle.getItemDetail(slot)
-    if detail and detail.name == itemName then
-      n = n + turtle.getItemCount(slot)
-    end
-  end
-  return n
-end
-
-function M.select(itemName)
-  local slot = M.find(itemName)
-  if not slot then return false end
-  turtle.select(slot)
-  return true
-end
-
 function M.summary()
+  -- CC:Tweaked serializa uma tabela Lua vazia como objeto JSON por padrão.
   local out = {}
-  for slot = 1, 16 do
-    local d = turtle.getItemDetail(slot)
-    if d then
-      out[d.name] = (out[d.name] or 0) + turtle.getItemCount(slot)
-    end
+  for slot=1,16 do
+    local item = turtle.getItemDetail(slot)
+    if item then out[item.name] = (out[item.name] or 0) + turtle.getItemCount(slot) end
   end
   return out
 end
-
+function M.free_slots()
+  local count=0; for slot=1,16 do if turtle.getItemCount(slot)==0 then count=count+1 end end; return count
+end
+function M.select_item(name)
+  for slot=1,16 do local d=turtle.getItemDetail(slot); if d and d.name==name and turtle.getItemCount(slot)>0 then turtle.select(slot); return true end end
+  return false, "material ausente: " .. name
+end
 return M

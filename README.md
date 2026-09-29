@@ -1,148 +1,39 @@
-# CC Fleet AI v2
+# CC Fleet OS
 
-Versao ampliada com:
+Sistema de coordenação de Turtles para CC:Tweaked. O painel recebe uma tarefa em linguagem natural, converte-a em um plano estruturado e a entrega a agentes Lua que executam apenas operações determinísticas permitidas.
 
-- site estilo pixel art
-- painel de frota em tempo quase real
-- status de todas as turtles
-- comandos de construcao com IA
-- goto
-- dig line
-- quarry
-- Pocket Computer atualizado
-- UTF-8 em todo o site para evitar caracteres quebrados
+## Início rápido
 
-## O que mudou em relacao a v1
+1. Instale Python 3.10+ e ngrok (autenticado) e as dependências: python -m pip install -r server/requirements.txt.
+2. Inicie com server/run.bat. Ele inicia API e ngrok, cria segredos fortes em server/data/secrets.json na primeira execução e mostra URL, senha e tokens no terminal.
+3. Opcionalmente, defina WEB_PASSWORD, FLEET_ENROLLMENT_TOKEN e PLAYER_BEACON_TOKEN antes de iniciar para substituir os segredos gerados.
+4. Em cada Turtle, execute um único comando:
 
-### Dashboard web
+       wget run https://SEU-ENDERECO/bootstrap/install.lua https://SEU-ENDERECO SEU_TOKEN_DE_CADASTRO "Mineradora 01"
 
-O servidor agora recebe status do PC central e mostra:
+5. Abra a URL no navegador e entre com WEB_PASSWORD.
 
-- estado atual de cada turtle
-- posicao X/Y/Z
-- combustivel
-- extras (destino, plan_id, progresso, etc.)
-- fila de comandos pendentes
-- eventos recentes
+Consulte [instalação detalhada](docs/INSTALL.md) e [arquitetura](docs/ARCHITECTURE.md).
 
-### Novos comandos
+## Tarefas reconhecidas
 
-- `goto`
-- `build`
-- `dig_line`
-- `quarry`
-- `reboot`
+- Venha até mim
+- Mine uma área de 20x20
+- Limpe uma área de 20x20
+- Construa uma parede de pedra 30x10
+- Construa uma casa 20x20
+- Construa uma ponte 16
+- Vá para 529 72 351
+- Volte para a base
 
-## Observacao importante sobre quarry
+A interpretação resulta em um tipo de tarefa e parâmetros validados no servidor. Nenhum texto da IA ou do painel é executado como Lua.
 
-Nesta versao, o comando `quarry` limpa a area em serpentina no plano atual e abre altura configuravel.
-Ele e intencionalmente conservador para nao destruir sua propria base por acidente.
-Se quiser, a proxima iteracao pode virar uma quarry 3D completa por camadas com retorno automatico ao bau.
+## Limites conhecidos do CC:Tweaked base
 
-## Instalação rápida
+GPS retorna somente X/Y/Z; dimensão e direção são mantidas pelo agente. A dimensão começa como minecraft:overworld e pode ser ajustada no arquivo /fleet/config.lua.
 
-### Servidor
+Uma Turtle comum não tem API para ler a posição de jogadores. Para Venha até mim, use o Pocket Beacon:
 
-Na pasta `server`:
+       wget run https://SEU-ENDERECO/bootstrap/beacon.lua https://SEU-ENDERECO TOKEN_DO_BEACON "João" minecraft:overworld
 
-```powershell
-python -m pip install -r requirements.txt
-ollama pull qwen3:4b
-```
-
-Edite `run.ps1` e troque:
-
-- `FLEET_TOKEN`
-- `WEB_PASSWORD`
-
-Rode:
-
-```powershell
-.
-un.ps1
-```
-
-Se for usar ngrok:
-
-```powershell
-ngrok http 8000
-```
-
-### PC central
-
-Copie:
-
-- `central/config.lua`
-- `central/controller.lua`
-- `central/startup.lua`
-
-Edite `config.lua` com:
-
-- URL do ngrok
-- mesmo token do servidor
-
-### Turtle
-
-Copie tudo da pasta `turtle/` mantendo a pasta `lib/`.
-
-Edite `turtle/config.lua`:
-
-- `controller_id` = ID do PC central
-- `server_url` = URL do ngrok
-- `fleet_token` = mesmo token
-- `turtle_name` = nome unico
-
-### Pocket
-
-Copie `pocket/` e configure o ID do central.
-
-## Exemplos de uso no site
-
-### Construção com IA
-
-```text
-Casa medieval 13x11, dois andares, paredes de spruce, janelas grandes e telhado.
-```
-
-### Goto
-
-- Controller ID: 8
-- Turtle ID: 0
-- X/Y/Z desejados
-
-### Dig line
-
-- comprimento: 20
-- altura: 2
-
-### Quarry
-
-- largura: 8
-- profundidade: 12
-- altura: 3
-
-## Comandos do central
-
-```text
-list
-ping <id>
-goto <id> <x> <y> <z>
-dig <id> <len> [altura]
-quarry <id> <w> <d> [altura]
-build <id> <plan_id>
-reboot <id>
-```
-
-
-## v2.3 - Telemetria e quebra de bloqueios
-
-- `build_dig_obstacles = true`: durante construções, a turtle pode quebrar blocos que bloqueiam seu deslocamento.
-- Status a cada 1 segundo.
-- Progresso por bloco em construções.
-- Progresso de `dig_line` e `quarry`.
-- Painel atualizado a cada 1 segundo.
-- Exibe posição, combustível, inventário, ação atual, progresso e online/offline.
-
-### Atenção
-
-Permitir quebra durante a construção é agressivo. Se a rota da turtle atravessar uma parte já construída, ela também pode quebrar esse bloco para passar. Use uma área de construção livre ou mantenha `build_dig_obstacles = false` quando quiser preservar absolutamente tudo ao redor.
+Carregue o Pocket Computer. Ele envia sua posição GPS ao servidor a cada três segundos. Não use comandos de servidor ou periféricos de mods extras como se fossem APIs nativas do CC:Tweaked.
