@@ -15,7 +15,9 @@ O run.ps1 inicia Uvicorn e ngrok e imprime a URL pública. A opção HTTP deve e
 
 O bootstrap pede URL HTTPS e token de cadastro uma única vez. Ele gera um token individual, grava /fleet/config.lua, baixa o agente e cria o startup.
 
-    wget run https://URL/bootstrap/install.lua https://URL TOKEN "Construtora 01"
+    wget run https://URL/bootstrap/install.lua https://URL TOKEN "Construtora 01" minecraft:overworld
+
+O último argumento opcional é a dimensão. Na Mining Dimension do ATM9 use `allthemodium:mining`.
 
 Depois do cadastro, configure opcionalmente a base em /fleet/config.lua:
 

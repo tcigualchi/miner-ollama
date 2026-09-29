@@ -4,6 +4,7 @@ local args = {...}
 local server = args[1]
 local enrollment = args[2]
 local name = args[3] or ("turtle-" .. os.getComputerID())
+local dimension = args[4] or "minecraft:overworld"
 
 if not server or not enrollment then
   print("Uso: wget run <url>/bootstrap/install.lua <url-do-servidor> <token-de-cadastro> [nome]")
@@ -30,7 +31,7 @@ end
 local info, err = request(server .. "/api/agents/register", textutils.serializeJSON({
   computer_id = os.getComputerID(),
   name = name,
-  dimension = "minecraft:overworld",
+  dimension = dimension,
   capabilities = {"gps", "move", "mine", "build", "inventory"},
 }), {["X-Enrollment-Token"] = enrollment})
 if not info then print("Cadastro falhou: " .. tostring(err)); return end
@@ -40,7 +41,7 @@ if not fs.exists(root) then fs.makeDir(root) end
 if not fs.exists(root .. "/lib") then fs.makeDir(root .. "/lib") end
 local config = {
   server_url = server, agent_id = info.agent_id, agent_token = info.agent_token,
-  name = name, dimension = "minecraft:overworld", gps_timeout = 2,
+  name = name, dimension = dimension, gps_timeout = 2,
   poll_seconds = info.poll_seconds or 2, heartbeat_seconds = 3,
   low_fuel_reserve = 120, update_seconds = 900,
 }
