@@ -57,6 +57,15 @@ local function clean_name(name)
   value=value:gsub("cobblestone wall", "cobblestone wall")
   return value
 end
+local item_name_aliases={
+  -- GrabCraft labels the placeable block as "Nether Brick"; Minecraft's
+  -- block item is minecraft:nether_bricks (singular is the crafting item).
+  ["nether bricks"]="nether brick",
+}
+local function match_name(name)
+  local value=clean_name(name)
+  return item_name_aliases[value] or value
+end
 local item_by_label={}
 local item_counts={}
 local inv_by_id={}
@@ -66,14 +75,16 @@ for slot=1,16 do
     inv_by_id[detail.name]=inv_by_id[detail.name] or {}
     table.insert(inv_by_id[detail.name],slot)
     item_counts[detail.name]=(item_counts[detail.name] or 0)+turtle.getItemCount(slot)
-    local label=clean_name(detail.displayName or detail.name:match("[^:]+$" ):gsub("_"," "))
+    local label=match_name(detail.displayName or detail.name:match("[^:]+$" ):gsub("_"," "))
     item_by_label[label]=item_by_label[label] or {}
     table.insert(item_by_label[label],detail.name)
   end
 end
 
 local function canonical_id(label)
-  local cleaned=clean_name(label):gsub(" ","_")
+  local cleaned=clean_name(label)
+  if cleaned=="nether brick" then cleaned="nether_bricks" end
+  cleaned=cleaned:gsub(" ","_")
   return "minecraft:"..cleaned
 end
 local requirements={}
@@ -85,7 +96,7 @@ local side_mount={}
 local facing_by_name={}
 for _,mat in ipairs(info.materials or {}) do
   local source=mat.name
-  local canonical=clean_name(source)
+  local canonical=match_name(source)
   local raw_state=(source:match("%((.-)%)") or ""):lower()
   local facing=raw_state:match("facing%s+(%a+)") or raw_state:match("^(%a+),%s*normal$")
   local is_ladder=source:lower():find("ladder",1,true)~=nil
