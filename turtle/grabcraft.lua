@@ -2,7 +2,7 @@
 local args={...}
 local url=args[1]
 if not url then
-  print("Uso: grabcraft <link-direto-do-blueprint>")
+  print("Uso: grabcraft <link-do-blueprint> [origemX origemY origemZ]")
   return
 end
 if not fs.exists("/.grabcraft") then
@@ -49,7 +49,12 @@ if not tonumber(info.block_count) or info.block_count>12000 or not tonumber(dims
 end
 
 local function clean_name(name)
-  local value=name:lower():gsub("%s*%([^)]*%)", ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+  local value=name:lower():gsub("_", " "):gsub("%s*%([^)]*%)", ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+  -- GrabCraft uses names from older Minecraft versions. In 1.21.1,
+  -- stained/hardened clay is terracotta, with the color in the item ID.
+  value=value:gsub(" stained hardened clay$", " terracotta")
+  value=value:gsub(" stained clay$", " terracotta")
+  value=value:gsub(" hardened clay$", " terracotta")
   value=value:gsub(" wood plank$", " planks")
   value=value:gsub(" wood slab$", " slab"):gsub(" wood stairs$", " stairs")
   value=value:gsub(" wood$", " log")
@@ -145,12 +150,30 @@ if #missing>0 then
 end
 
 -- Load one layer at a time; estimate its exact Manhattan travel before moving.
-local sx,sy,sz=gps.locate(2)
-local start={x=sx,y=sy,z=sz}
+local state_path="/.grabcraft-build-"..tostring(info.model_id)..".txt"
+local start=nil
+if args[2] and args[3] and args[4] then
+  start={x=tonumber(args[2]),y=tonumber(args[3]),z=tonumber(args[4])}
+elseif fs.exists(state_path) then
+  local state_file=fs.open(state_path,"r")
+  local saved=textutils.unserialize(state_file.readAll())
+  state_file.close()
+  if saved and saved.x and saved.y and saved.z then start=saved end
+end
+if not start then
+  local sx,sy,sz=gps.locate(2)
+  start={x=sx,y=sy,z=sz}
+end
 if not start.x then print("Construção cancelada: GPS indisponível."); return end
+local state_file=fs.open(state_path,"w")
+state_file.write(textutils.serialize(start,{compact=true}))
+state_file.close()
+local px,py,pz=gps.locate(2)
+if not px then print("GPS unavailable at the Turtle's current position."); return end
+local current={x=px,y=py,z=pz}
 local layers={}
 local movement_cost=0
-local prev={x=start.x,y=start.y,z=start.z}
+local prev={x=current.x,y=current.y,z=current.z}
 local vectors={north={x=0,z=-1},east={x=1,z=0},south={x=0,z=1},west={x=-1,z=0}}
 local headings={"north","east","south","west"}
 local heading=nil
@@ -167,7 +190,7 @@ local function face(wanted)
   end
   return false,"não foi possível orientar para "..wanted
 end
-local position={x=start.x,y=start.y,z=start.z}
+local position={x=current.x,y=current.y,z=current.z}
 local function move_to(target)
   local function axis(axis_name,positive,negative)
     while position[axis_name]~=target[axis_name] do
@@ -251,11 +274,11 @@ if not moved then print("Construção cancelada: deixe livre o bloco à frente p
 local cx,cy,cz=gps.locate(2)
 local backed=turtle.back()
 local rx,ry,rz=gps.locate(2)
-if not backed or not cx or not rx or rx~=start.x or ry~=start.y or rz~=start.z then
+if not backed or not cx or not rx or rx~=current.x or ry~=current.y or rz~=current.z then
   print("Construção cancelada: não consegui calibrar e voltar ao ponto GPS inicial."); return
 end
-if cx>start.x then heading="east" elseif cx<start.x then heading="west"
-elseif cz>start.z then heading="south" elseif cz<start.z then heading="north" end
+if cx>current.x then heading="east" elseif cx<current.x then heading="west"
+elseif cz>current.z then heading="south" elseif cz<current.z then heading="north" end
 if not heading then print("Construção cancelada: o GPS não detectou a direção."); return end
 
 print("\nGPS/origem: "..start.x..", "..start.y..", "..start.z.." (canto mínimo; +X leste, +Z sul)")
@@ -342,3 +365,4 @@ for layer=1,#layers do
   end
 end
 print("Construção concluída. Novos blocos colocados: "..placed)
+if fs.exists(state_path) then fs.delete(state_path) end
