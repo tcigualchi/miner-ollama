@@ -50,8 +50,9 @@ end
 
 local function clean_name(name)
   local value=name:lower():gsub("%s*%([^)]*%)", ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+  value=value:gsub(" wood plank$", " planks")
   value=value:gsub(" wood slab$", " slab"):gsub(" wood stairs$", " stairs")
-  value=value:gsub(" wood$", " planks")
+  value=value:gsub(" wood$", " log")
   value=value:gsub("hay bale", "hay block")
   value=value:gsub("mob head", "player head")
   value=value:gsub("cobblestone wall", "cobblestone wall")
@@ -61,6 +62,7 @@ local item_name_aliases={
   -- GrabCraft labels the placeable block as "Nether Brick"; Minecraft's
   -- block item is minecraft:nether_bricks (singular is the crafting item).
   ["nether bricks"]="nether brick",
+  ["stone bricks"]="stone brick",
 }
 local function match_name(name)
   local value=clean_name(name)
@@ -84,6 +86,7 @@ end
 local function canonical_id(label)
   local cleaned=clean_name(label)
   if cleaned=="nether brick" then cleaned="nether_bricks" end
+  if cleaned=="stone brick" then cleaned="stone_bricks" end
   cleaned=cleaned:gsub(" ","_")
   return "minecraft:"..cleaned
 end
@@ -121,27 +124,19 @@ for _,mat in ipairs(info.materials or {}) do
       for item_id in pairs(inv_by_id) do if item_id:find("head",1,true) or item_id:find("skull",1,true) then table.insert(candidates,item_id) end end
       if #candidates==1 then chosen=candidates[1] end
     end
-    if not chosen then
-      table.insert(missing,source.." -> esperado "..id)
-    else
-      safe_material[source]=chosen
-      requirements[chosen]=(requirements[chosen] or 0)+tonumber(mat.count)
-      used[chosen]=true
-      if facing and ({north=true,east=true,south=true,west=true})[facing] then facing_by_name[source]=facing end
-    end
+    chosen=chosen or id -- missing blocks are waited for at placement time
+    safe_material[source]=chosen
+    requirements[chosen]=(requirements[chosen] or 0)+tonumber(mat.count)
+    used[chosen]=true
+    if facing and ({north=true,east=true,south=true,west=true})[facing] then facing_by_name[source]=facing end
   end
 end
-if #unsupported>0 or #missing>0 then
+if #unsupported>0 then
   print("\nConstrução cancelada antes de se mover.")
   for _,value in ipairs(unsupported) do print("  Não suportado: "..value) end
   for _,value in ipairs(missing) do print("  Material ausente ou ambíguo: "..value) end
   print("Coloque materiais identificáveis nos slots da Turtle e tente de novo.")
   return
-end
-for item_id,count in pairs(requirements) do
-  if (item_counts[item_id] or 0)<count then
-    table.insert(missing,item_id.." (tem "..tostring(item_counts[item_id] or 0)..", precisa "..count..")")
-  end
 end
 if #missing>0 then
   print("\nConstrução cancelada: faltam materiais.")
@@ -269,6 +264,32 @@ print("A Turtle não escava: terreno ou blocos ocupando a planta fazem a execuç
 print("Blocos de orientação do GrabCraft são aproximados conforme o lado de colocação do CC:Tweaked.")
 local placed=0
 local processed=0
+local function select_material(block)
+  local expected_label=match_name(block.name)
+  for slot=1,16 do
+    local detail=turtle.getItemDetail(slot)
+    if detail and turtle.getItemCount(slot)>0 then
+      local label=match_name(detail.displayName or detail.name:match("[^:]+$"):gsub("_"," "))
+      if detail.name==block.item or label==expected_label then
+        turtle.select(slot)
+        return true
+      end
+    end
+  end
+  return false
+end
+local function wait_for_material(block)
+  print("\nPAUSADA: preciso de "..block.name.." ("..block.item..").")
+  print("Insira esse bloco no inventÃ¡rio da Turtle; verifico novamente a cada 2 segundos.")
+  print("Deixe um slot livre. Quando o item aparecer, continuo deste bloco automaticamente.")
+  while true do
+    if select_material(block) then
+      print("Material detectado: "..block.name..". Continuando.")
+      return true
+    end
+    sleep(2)
+  end
+end
 local function report_progress()
   processed=processed+1
   if processed%25==0 or processed==info.block_count then
@@ -291,9 +312,7 @@ for layer=1,#layers do
         end
         report_progress()
       else
-        local selected=false
-        for slot=1,16 do local detail=turtle.getItemDetail(slot); if detail and detail.name==block.item and turtle.getItemCount(slot)>0 then turtle.select(slot); selected=true; break end end
-        if not selected then print("PAREI: acabou "..block.item); return end
+        if not select_material(block) then wait_for_material(block) end
         local success,place_error=turtle.place()
         if not success then print("PAREI ao colocar "..block.name..": "..tostring(place_error)); return end
         placed=placed+1
@@ -314,12 +333,7 @@ for layer=1,#layers do
         ok,err=face(facing_by_name[block.name])
         if not ok then print("PAREI ao orientar bloco: "..tostring(err)); return end
       end
-      local selected=false
-      for slot=1,16 do
-        local detail=turtle.getItemDetail(slot)
-        if detail and detail.name==block.item and turtle.getItemCount(slot)>0 then turtle.select(slot); selected=true; break end
-      end
-      if not selected then print("PAREI: acabou "..block.item..". Pode reabastecer e executar de novo para retomar."); return end
+      if not select_material(block) then wait_for_material(block) end
       local success,place_error=turtle.placeDown()
       if not success then print("PAREI ao colocar "..block.name..": "..tostring(place_error)); return end
       placed=placed+1
