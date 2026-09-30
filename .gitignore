@@ -2,5 +2,6 @@ server/data/fleet.db
 server/data/fleet.db-shm
 server/data/fleet.db-wal
 server/data/secrets.json
+server/data/grabcraft-token.txt
 server/__pycache__/
 **/__pycache__/

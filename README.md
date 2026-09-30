@@ -1,39 +1,37 @@
-# CC Fleet OS
+﻿# Construção de blueprints do GrabCraft via Turtle
 
-Sistema de coordenação de Turtles para CC:Tweaked. O painel recebe uma tarefa em linguagem natural, converte-a em um plano estruturado e a entrega a agentes Lua que executam apenas operações determinísticas permitidas.
+O comando principal recebe uma página individual de blueprint, busca seu modelo 3D voxelizado, consulta a posição GPS da Turtle, confere materiais/combustível e constrói o modelo em camadas. Não há painel web nesta experiência; a resposta e o progresso aparecem no terminal da própria Turtle. O ngrok expõe apenas a API headless do PC central.
 
-## Início rápido
+## PC central
 
-1. Instale Python 3.10+ e ngrok (autenticado) e as dependências: python -m pip install -r server/requirements.txt.
-2. Inicie com server/run.bat. Ele inicia API e ngrok, cria segredos fortes em server/data/secrets.json na primeira execução e mostra URL, senha e tokens no terminal.
-3. Opcionalmente, defina WEB_PASSWORD, FLEET_ENROLLMENT_TOKEN e PLAYER_BEACON_TOKEN antes de iniciar para substituir os segredos gerados.
-4. Em cada Turtle, execute um único comando:
+1. Tenha Python 3.10+ e ngrok autenticado no PATH.
+2. Instale as dependências uma vez: `python -m pip install -r server/requirements.txt`.
+3. Execute `server/run.bat` ou `server/run.ps1` e mantenha essa janela aberta. O terminal imprime a URL do ngrok e um comando de instalação com token individual do inspetor.
 
-       wget run https://SEU-ENDERECO/bootstrap/install.lua https://SEU-ENDERECO SEU_TOKEN_DE_CADASTRO "Mineradora 01"
+## Turtle
 
-5. Abra a URL no navegador e entre com WEB_PASSWORD.
+Ative HTTP no CC:Tweaked e permita o host ngrok. Execute o comando de instalação impresso pelo PC uma vez:
 
-Consulte [instalação detalhada](docs/INSTALL.md) e [arquitetura](docs/ARCHITECTURE.md).
+    wget run https://SEU-NGROK/install.lua https://SEU-NGROK TOKEN
 
-## Tarefas reconhecidas
+Para enviar uma construção, posicione a Turtle no canto mínimo da fundação, em espaço livre, e execute o link individual da página GrabCraft:
 
-- Venha até mim
-- Mine uma área de 20x20
-- Limpe uma área de 20x20
-- Construa uma parede de pedra 30x10
-- Construa uma casa 20x20
-- Construa uma ponte 16
-- Vá para 529 72 351
-- Volte para a base
+    grabcraft https://www.grabcraft.com/minecraft/troll-watchtower/military-buildings
 
-A interpretação resulta em um tipo de tarefa e parâmetros validados no servidor. Nenhum texto da IA ou do painel é executado como Lua.
+A Turtle usa o GPS atual como origem: X cresce para leste, Z para sul e Y para cima. Ela calibra a direção com um movimento curto e reversível, verifica se os itens e o combustível bastam antes de iniciar, não escava blocos e para se encontrar obstáculos ou desvios no GPS. Se parar depois de iniciar, pode reexecutar o mesmo link para retomar blocos já colocados que coincidam com o plano.
 
-## Limites conhecidos do CC:Tweaked base
+Para atualizar o comando da Turtle, execute novamente o mesmo comando `wget run .../install.lua ...`; ele substitui o programa local.
 
-GPS retorna somente X/Y/Z; dimensão e direção são mantidas pelo agente. A dimensão começa como minecraft:overworld e pode ser ajustada no arquivo /fleet/config.lua.
+## Limites do construtor
 
-Uma Turtle comum não tem API para ler a posição de jogadores. Para Venha até mim, use o Pocket Beacon:
+A construção usa as coordenadas voxel do modelo 3D do GrabCraft (não uma interpretação por IA das imagens). A primeira versão limita cada dimensão a 128 blocos e o projeto a 12.000 voxels. O inventário precisa conter todos os materiais ao mesmo tempo. Itens de blocos são associados a nomes conhecidos, e materiais ausentes ou ambíguos fazem a Turtle parar antes de se mover.
 
-       wget run https://SEU-ENDERECO/bootstrap/beacon.lua https://SEU-ENDERECO TOKEN_DO_BEACON "João" minecraft:overworld
+O modelo do site descreve nomes, posições e algumas direções, mas pode não expor todos os estados internos do Minecraft. Estados como metade/orientação de slabs podem diferir; a Turtle reporta essa aproximação antes de construir. A Turtle não limpa terreno e não substitui blocos: área ocupada interrompe a execução. Coloque-a junto a uma área plana e livre, com espaço acima para calibrar e construir. Teste primeiro um blueprint pequeno em local descartável.
 
-Carregue o Pocket Computer. Ele envia sua posição GPS ao servidor a cada três segundos. Não use comandos de servidor ou periféricos de mods extras como se fossem APIs nativas do CC:Tweaked.
+Páginas que não têm um JSON de modelo 3D no GrabCraft não são aceitas para construção automática. A listagem geral `/minecraft/buildings` não é um blueprint; use a página individual da construção.
+
+## Serviço e segurança
+
+`server/run.ps1` inicia somente o inspetor sem interface. O inspetor aceita links HTTPS de GrabCraft, limita o tamanho do modelo e protege a consulta com token. O token é gravado em `server/data/grabcraft-token.txt`, ignorado pelo Git. Para revogá-lo, pare o serviço, apague esse arquivo e inicie novamente; reinstale então as Turtles com o token novo.
+
+O painel e o sistema de frota anteriores foram preservados como legado em `server/run-fleet-legacy.ps1`, mas não fazem parte deste fluxo.
