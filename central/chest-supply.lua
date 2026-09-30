@@ -80,11 +80,14 @@ local function fulfill(msg)
   return moved_total, moved_total < requested and "quantidade parcial; confira os baus" or nil
 end
 
-print("Despachante de baus ativo. Saida: " .. cfg.output)
-print("Inventarios fonte encontrados: " .. #sourceInventories())
+print("Despachante de baus ativo. ID deste computador: " .. os.getComputerID())
+print("Saida: " .. cfg.output .. " | inventarios fonte encontrados: " .. #sourceInventories())
 while true do
   local sender, msg = rednet.receive(protocol)
-  if type(msg) == "table" and msg.type == "request" and msg.secret == cfg.secret then
+  if type(msg) == "table" and msg.type == "request" then
+    if msg.secret ~= cfg.secret then
+      print("Pedido recebido da Turtle #" .. tostring(sender) .. ", mas a chave configurada nao confere.")
+    else
     local ok, count, detail = pcall(fulfill, msg)
     local response
     if ok then
@@ -97,5 +100,6 @@ while true do
     end
     response.id = msg.id
     rednet.send(sender, response, protocol)
+    end
   end
 end
