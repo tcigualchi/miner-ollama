@@ -34,6 +34,12 @@ local dims=info.dimensions or {}
 print("Blueprint: "..tostring(info.title))
 print("Dimensões L x A x P: "..tostring(dims.width).." x "..tostring(dims.height).." x "..tostring(dims.depth))
 print("Blocos: "..tostring(info.block_count))
+if tonumber(info.ignored_block_count) and info.ignored_block_count>0 then
+  print("Ignorados (criativo/indisponíveis): "..tostring(info.ignored_block_count))
+  for _,item in ipairs(info.ignored_materials or {}) do
+    print("  ignorando "..tostring(item.count).." x "..tostring(item.name))
+  end
+end
 print("Materiais necessários:")
 for _,item in ipairs(info.materials or {}) do print("  "..tostring(item.count).." x "..tostring(item.name)) end
 

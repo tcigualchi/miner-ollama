@@ -22,6 +22,22 @@ LUA_CLIENT = os.path.join(ROOT, "turtle", "grabcraft.lua")
 LUA_INSTALLER = os.path.join(ROOT, "turtle", "grabcraft-install.lua")
 app = FastAPI(title="GrabCraft terminal bridge", docs_url=None, redoc_url=None, openapi_url=None)
 
+# Skip model entries with no usable survival item for this builder. The filter
+# is shared by the material preflight and layer feed so ignored voxels never
+# stop construction later.
+IGNORED_BLOCKS = {
+    "grass", "grass block", "barrier", "bedrock", "spawner",
+    "end portal frame", "end portal", "nether portal",
+    "command block", "chain command block", "repeating command block",
+    "structure block", "structure void", "jigsaw block", "light block",
+    "reinforced deepslate", "debug block",
+}
+
+
+def is_ignored_block(name: str) -> bool:
+    base = re.sub(r"\s*\([^)]*\)", "", str(name)).strip().lower()
+    return re.sub(r"\s+", " ", base) in IGNORED_BLOCKS
+
 
 class InspectRequest(BaseModel):
     url: str = Field(min_length=20, max_length=500)
@@ -150,6 +166,7 @@ def inspect_page(url: str) -> dict:
     model_id = model_match.group(1)
     model = fetch_model(model_id)
     material_counts: dict[str, int] = {}
+    ignored_counts: dict[str, int] = {}
     total = 0
     max_x = max_y = max_z = 0
     for y_key, columns in model.items():
@@ -169,9 +186,11 @@ def inspect_page(url: str) -> dict:
                 except (ValueError, TypeError):
                     continue
                 name = str(block.get("name", "")).strip()
-                if name:
+                if name and not is_ignored_block(name):
                     material_counts[name] = material_counts.get(name, 0) + 1
                     total += 1
+                elif name:
+                    ignored_counts[name] = ignored_counts.get(name, 0) + 1
     if total == 0:
         raise HTTPException(422, "O modelo 3D está vazio ou usa um formato não reconhecido")
     materials = [{"name": name, "count": str(count)} for name, count in sorted(material_counts.items())]
@@ -182,6 +201,8 @@ def inspect_page(url: str) -> dict:
         "url": final_url,
         "model_id": model_id,
         "block_count": total,
+        "ignored_block_count": sum(ignored_counts.values()),
+        "ignored_materials": [{"name": name, "count": count} for name, count in sorted(ignored_counts.items())],
         "dimensions": {"width": max_x, "height": max_y, "depth": max_z},
         "materials": materials,
         "note": "Este blueprint contém voxels com coordenadas e pode ser enviado à Turtle para construção.",
@@ -224,7 +245,7 @@ def get_layer(model_id: str, y: int) -> list[dict]:
             except (TypeError, ValueError):
                 continue
             name = str(block.get("name", "")).strip()
-            if name:
+            if name and not is_ignored_block(name):
                 blocks.append({"x": x - 1, "z": z - 1, "name": name})
     blocks.sort(key=lambda item: (item["z"], item["x"]))
     return blocks
