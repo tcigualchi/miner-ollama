@@ -11,6 +11,64 @@ if not fs.exists("/.grabcraft") then
 end
 local f=fs.open("/.grabcraft","r")
 local config=textutils.unserialize(f.readAll()); f.close()
+local fuel_reserve=tonumber(config.fuel_reserve) or 120
+local fuel_item_set={}
+for _,name in ipairs(config.fuel_items or {"minecraft:coal","minecraft:charcoal"}) do fuel_item_set[name]=true end
+local supply_protocol="grabcraft.ae2_supply.v1"
+local supply_modem=false
+if tonumber(config.supply_computer_id) and type(config.supply_secret)=="string" and #config.supply_secret>=8 then
+  peripheral.find("modem",function(name,modem)
+    if modem.isWireless() then rednet.open(name); supply_modem=true end
+  end)
+end
+local function refuel_for_move()
+  local warned=false
+  while true do
+    local level=turtle.getFuelLevel()
+    if level=="unlimited" then return true end
+    local limit=turtle.getFuelLimit()
+    if limit=="unlimited" then return true end
+    local target=math.min(fuel_reserve+1,limit)
+    if level>=target then return true end
+    local gained=false
+    if config.auto_refuel~=false then
+      local old_slot=turtle.getSelectedSlot()
+      for slot=1,16 do
+        local detail=turtle.getItemDetail(slot)
+        if level>=target then break end
+        if detail and fuel_item_set[detail.name] and turtle.getItemCount(slot)>0 then
+          turtle.select(slot)
+          local can_refuel=turtle.refuel(0)
+          if can_refuel then
+            local before=turtle.getFuelLevel()
+            turtle.refuel(1)
+            level=turtle.getFuelLevel()
+            if level>before then gained=true end
+          end
+        end
+      end
+      if old_slot then turtle.select(old_slot) end
+      level=turtle.getFuelLevel()
+      if level=="unlimited" or level>=target then return true end
+    end
+    if not gained then
+      if not warned then
+        print("PAUSADA: pouco combustivel. Coloque carvao na Turtle; vou reabastecer e continuar.")
+        warned=true
+      end
+      sleep(2)
+    end
+  end
+end
+local function move_with_fuel(move)
+  refuel_for_move()
+  local ok,err=move()
+  if not ok and turtle.getFuelLevel()==0 then
+    refuel_for_move()
+    ok,err=move()
+  end
+  return ok,err
+end
 local endpoint=config.server.."/inspect"
 local function post(path,value)
   local target=config.server..path
@@ -182,23 +240,35 @@ local function gps_position()
   end
 end
 local state_path="/.grabcraft-build-"..tostring(info.model_id)..".txt"
+local saved_state=nil
+if fs.exists(state_path) then
+  local state_file=fs.open(state_path,"r")
+  saved_state=textutils.unserialize(state_file.readAll())
+  state_file.close()
+end
 local start=nil
 if args[2] and args[3] and args[4] then
   start={x=tonumber(args[2]),y=tonumber(args[3]),z=tonumber(args[4])}
-elseif fs.exists(state_path) then
-  local state_file=fs.open(state_path,"r")
-  local saved=textutils.unserialize(state_file.readAll())
-  state_file.close()
-  if saved and saved.x and saved.y and saved.z then start=saved end
+elseif saved_state and saved_state.x and saved_state.y and saved_state.z then
+  start={x=saved_state.x,y=saved_state.y,z=saved_state.z}
 end
 if not start then
   local sx,sy,sz=gps_position()
   start={x=sx,y=sy,z=sz}
 end
 if not start.x then print("Construção cancelada: GPS indisponível."); return end
-local state_file=fs.open(state_path,"w")
-state_file.write(textutils.serialize(start,{compact=true}))
-state_file.close()
+local resume_layer,resume_index,resume_completed=1,1,0
+if saved_state and saved_state.x==start.x and saved_state.y==start.y and saved_state.z==start.z then
+  resume_layer=tonumber(saved_state.layer) or 1
+  resume_index=tonumber(saved_state.index) or 1
+  resume_completed=tonumber(saved_state.completed) or 0
+end
+local function save_progress(layer,index,completed)
+  local state_file=fs.open(state_path,"w")
+  state_file.write(textutils.serialize({x=start.x,y=start.y,z=start.z,layer=layer,index=index,completed=completed},{compact=true}))
+  state_file.close()
+end
+save_progress(resume_layer,resume_index,resume_completed)
 local px,py,pz=gps_position()
 local current={x=px,y=py,z=pz}
 local layers={}
@@ -227,10 +297,11 @@ local function move_to(target)
       local step=target[axis_name]>position[axis_name] and 1 or -1
       local ok,err
       if axis_name=="y" then
-        if step>0 then ok,err=turtle.up() else ok,err=turtle.down() end
+        if step>0 then ok,err=move_with_fuel(function() return turtle.up() end)
+        else ok,err=move_with_fuel(function() return turtle.down() end) end
       else
         ok,err=face(step>0 and positive or negative)
-        if ok then ok,err=turtle.forward() end
+        if ok then ok,err=move_with_fuel(function() return turtle.forward() end) end
       end
       if not ok then return false,"movimento bloqueado no eixo "..axis_name..": "..tostring(err) end
       position[axis_name]=position[axis_name]+step
@@ -287,26 +358,26 @@ for layer=1,dims.height do
     if a.z~=b.z then return a.z<b.z end
     return a.x<b.x
   end)
-  for _,block in ipairs(layers[layer]) do
-    movement_cost=movement_cost+math.abs(block.approach.x-prev.x)+math.abs(block.approach.y-prev.y)+math.abs(block.approach.z-prev.z)
-    prev=block.approach
+  for block_index,block in ipairs(layers[layer]) do
+    if layer>resume_layer or (layer==resume_layer and block_index>=resume_index) then
+      movement_cost=movement_cost+math.abs(block.approach.x-prev.x)+math.abs(block.approach.y-prev.y)+math.abs(block.approach.z-prev.z)
+      prev=block.approach
+    end
   end
 end
+refuel_for_move()
 local fuel=turtle.getFuelLevel()
-local reserve=120
+local reserve=fuel_reserve
 local calibration_cost=2
-if fuel~="unlimited" and fuel<movement_cost+reserve+calibration_cost then
-  print("Construção cancelada: combustível insuficiente.")
-  print("Estimativa segura: "..movement_cost.." movimentos + reserva de "..reserve.."; disponível: "..tostring(fuel))
-  print("Abasteça sem retirar os blocos da construção e execute novamente.")
-  return
+if fuel~='unlimited' then
+  print('Movimentos estimados: '..movement_cost..'; combustivel atual: '..tostring(fuel)..'. Reabastecimento automatico ativo.')
 end
 
 -- Infer cardinal facing by one reversible move, comparing GPS before/after.
-local moved=turtle.forward()
+local moved=move_with_fuel(function() return turtle.forward() end)
 if not moved then print("Construção cancelada: deixe livre o bloco à frente para calibrar."); return end
 local cx,cy,cz=gps_position()
-local backed=turtle.back()
+local backed=move_with_fuel(function() return turtle.back() end)
 local rx,ry,rz=gps_position()
 if not backed or not cx or not rx or rx~=current.x or ry~=current.y or rz~=current.z then
   print("Construção cancelada: não consegui calibrar e voltar ao ponto GPS inicial."); return
@@ -320,7 +391,7 @@ print("Deslocamento estimado: "..movement_cost.." blocos, mais calibração GPS.
 print("A Turtle não escava: terreno ou blocos ocupando a planta fazem a execução parar com segurança.")
 print("Blocos de orientação do GrabCraft são aproximados conforme o lado de colocação do CC:Tweaked.")
 local placed=0
-local processed=0
+local processed=resume_completed
 local function select_material(block)
   local expected_label=match_name(block.name)
   for slot=1,16 do
@@ -335,7 +406,84 @@ local function select_material(block)
   end
   return false
 end
+local function fetch_material_from_ae2(block)
+  if not config.supply_station then return false end
+  local central_id=tonumber(config.supply_computer_id)
+  local work_position={x=position.x,y=position.y,z=position.z}
+  local home=config.supply_station or {x=start.x,y=start.y,z=start.z}
+  local function restore_work()
+    local restored,restore_error=move_to(work_position)
+    if not restored then error("PAREI ao voltar do abastecimento: "..tostring(restore_error)) end
+  end
+  print("Voltando ao ponto de abastecimento...")
+  local reached,travel_error=move_to(home)
+  if not reached then
+    print("Nao consegui chegar ao ponto AE2: "..tostring(travel_error))
+    restore_work()
+    return false
+  end
+  local delivered=true
+  if supply_modem then
+    local request_id=tostring(os.getComputerID()).."-"..tostring(os.epoch("utc"))
+    local request={type="request",id=request_id,secret=config.supply_secret,item=block.item,count=64}
+    print("Solicitando ate 64 x "..block.item.." ao ME Bridge...")
+    if not rednet.send(central_id,request,supply_protocol) then
+      print("Falha ao enviar pedido ao computador AE2.")
+      restore_work()
+      return false
+    end
+    delivered=false
+    local timeouts=0
+    while true do
+      local sender,response=rednet.receive(supply_protocol,15)
+      if sender==central_id and type(response)=="table" and response.id==request_id and response.type=="result" then
+        if response.ok then
+          print("Separado no ponto de carga: "..tostring(response.count or 64).." x "..block.item)
+          delivered=true
+        else
+          print("O ME Bridge nao forneceu o item: "..tostring(response.error or "erro desconhecido"))
+        end
+        break
+      elseif not sender then
+        timeouts=timeouts+1
+        if timeouts>=4 then
+          print("Despachante AE2 sem resposta. Vou tentar novamente durante a pausa.")
+          restore_work()
+          return false
+        end
+        print("Aguardando o ME Bridge... reenviando pedido.")
+        rednet.send(central_id,request,supply_protocol)
+      end
+    end
+    if not delivered then restore_work(); return false end
+  else
+    print("Aguardando "..block.item.." no bau abaixo da Turtle...")
+  end
+  while not select_material(block) do
+    local before={}
+    for slot=1,16 do
+      local detail=turtle.getItemDetail(slot)
+      if detail then before[detail.name]=(before[detail.name] or 0)+turtle.getItemCount(slot) end
+    end
+    turtle.suckDown()
+    if select_material(block) then break end
+    local changed=false
+    for slot=1,16 do
+      local detail=turtle.getItemDetail(slot)
+      if detail and turtle.getItemCount(slot)>(before[detail.name] or 0) then changed=true end
+    end
+    if not changed then
+      print("Sem item no bau inferior ou inventario cheio. Libere um slot; tento novamente.")
+      sleep(3)
+    end
+  end
+  print("Material coletado. Voltando ao bloco de trabalho...")
+  restore_work()
+  return select_material(block)
+end
 local function wait_for_material(block)
+  if config.supply_station and fetch_material_from_ae2(block) then return true end
+  local last_supply_attempt=os.epoch("utc")
   print("\nPAUSADA: preciso de "..block.name.." ("..block.item..").")
   print("Insira esse bloco no inventÃ¡rio da Turtle; verifico novamente a cada 2 segundos.")
   print("Deixe um slot livre. Quando o item aparecer, continuo deste bloco automaticamente.")
@@ -343,6 +491,10 @@ local function wait_for_material(block)
     if select_material(block) then
       print("Material detectado: "..block.name..". Continuando.")
       return true
+    end
+    if config.supply_station and os.epoch("utc")-last_supply_attempt>=30000 then
+      last_supply_attempt=os.epoch("utc")
+      if fetch_material_from_ae2(block) then return true end
     end
     sleep(2)
   end
@@ -353,9 +505,11 @@ local function report_progress()
     print("Progresso: "..processed.."/"..info.block_count.." voxels; novos blocos: "..placed)
   end
 end
-for layer=1,#layers do
+for layer=resume_layer,#layers do
   print("Camada "..layer.."/"..dims.height.." ("..#layers[layer].." blocos)")
-  for _,block in ipairs(layers[layer]) do
+  local first_index=layer==resume_layer and resume_index or 1
+  for block_index=first_index,#layers[layer] do
+    local block=layers[layer][block_index]
     local ok,err=move_to(block.approach)
     if not ok then print("PAREI no GPS da camada "..layer..": "..tostring(err)); return end
     if is_side(block) then
@@ -396,6 +550,9 @@ for layer=1,#layers do
       placed=placed+1
       report_progress()
     end
+    local next_layer,next_index=layer,block_index+1
+    if next_index>#layers[layer] then next_layer,next_index=layer+1,1 end
+    save_progress(next_layer,next_index,processed)
   end
 end
 print("Construção concluída. Novos blocos colocados: "..placed)

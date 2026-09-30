@@ -20,6 +20,7 @@ TOKEN = os.environ.get("GRABCRAFT_TOKEN", "")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LUA_CLIENT = os.path.join(ROOT, "turtle", "grabcraft.lua")
 LUA_INSTALLER = os.path.join(ROOT, "turtle", "grabcraft-install.lua")
+AE2_SUPPLY_CLIENT = os.path.join(ROOT, "central", "ae2-supply.lua")
 app = FastAPI(title="GrabCraft terminal bridge", docs_url=None, redoc_url=None, openapi_url=None)
 
 # Skip model entries with no usable survival item for this builder. The filter
@@ -271,6 +272,11 @@ def installer():
 @app.get("/grabcraft.lua")
 def client_program():
     return FileResponse(LUA_CLIENT, media_type="text/plain; charset=utf-8")
+
+
+@app.get("/ae2-supply.lua")
+def ae2_supply_program():
+    return FileResponse(AE2_SUPPLY_CLIENT, media_type="text/plain; charset=utf-8")
 
 
 @app.post("/inspect")
