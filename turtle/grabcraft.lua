@@ -156,6 +156,31 @@ if #missing>0 then
 end
 
 -- Load one layer at a time; estimate its exact Manhattan travel before moving.
+local function grid_coord(value)
+  if value<0 then return math.ceil(value-0.5) end
+  return math.floor(value+0.5)
+end
+local function gps_position()
+  local previous=nil
+  local reported=false
+  while true do
+    local x,y,z=gps.locate(5)
+    if x then
+      local point={x=grid_coord(x),y=grid_coord(y),z=grid_coord(z)}
+      if previous and point.x==previous.x and point.y==previous.y and point.z==previous.z then
+        return point.x,point.y,point.z
+      end
+      previous=point
+    else
+      previous=nil
+      if not reported then
+        print("GPS sem resposta. Construcao pausada; aguardando o sinal voltar...")
+        reported=true
+      end
+    end
+    sleep(1)
+  end
+end
 local state_path="/.grabcraft-build-"..tostring(info.model_id)..".txt"
 local start=nil
 if args[2] and args[3] and args[4] then
@@ -167,15 +192,14 @@ elseif fs.exists(state_path) then
   if saved and saved.x and saved.y and saved.z then start=saved end
 end
 if not start then
-  local sx,sy,sz=gps.locate(2)
+  local sx,sy,sz=gps_position()
   start={x=sx,y=sy,z=sz}
 end
 if not start.x then print("Construção cancelada: GPS indisponível."); return end
 local state_file=fs.open(state_path,"w")
 state_file.write(textutils.serialize(start,{compact=true}))
 state_file.close()
-local px,py,pz=gps.locate(2)
-if not px then print("GPS unavailable at the Turtle's current position."); return end
+local px,py,pz=gps_position()
 local current={x=px,y=py,z=pz}
 local layers={}
 local movement_cost=0
@@ -216,9 +240,13 @@ local function move_to(target)
   local ok,err=axis("y","up","down"); if not ok then return false,err end
   ok,err=axis("x","east","west"); if not ok then return false,err end
   ok,err=axis("z","south","north"); if not ok then return false,err end
-  local x,y,z=gps.locate(2)
-  if not x or x~=position.x or y~=position.y or z~=position.z then
-    return false,"GPS divergiu da rota; parei por segurança"
+  local x,y,z=gps_position()
+  local drift=math.abs(x-position.x)+math.abs(y-position.y)+math.abs(z-position.z)
+  if drift>3 then
+    return false,"GPS confirmou posicao inesperada ("..x..", "..y..", "..z.."); confira o local"
+  elseif drift>0 then
+    print("GPS corrigiu a posicao estimada para "..x..", "..y..", "..z.."; continuando.")
+    position={x=x,y=y,z=z}
   end
   return true
 end
@@ -277,9 +305,9 @@ end
 -- Infer cardinal facing by one reversible move, comparing GPS before/after.
 local moved=turtle.forward()
 if not moved then print("Construção cancelada: deixe livre o bloco à frente para calibrar."); return end
-local cx,cy,cz=gps.locate(2)
+local cx,cy,cz=gps_position()
 local backed=turtle.back()
-local rx,ry,rz=gps.locate(2)
+local rx,ry,rz=gps_position()
 if not backed or not cx or not rx or rx~=current.x or ry~=current.y or rz~=current.z then
   print("Construção cancelada: não consegui calibrar e voltar ao ponto GPS inicial."); return
 end
