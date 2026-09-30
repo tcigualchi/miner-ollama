@@ -55,6 +55,12 @@ local function clean_name(name)
   value=value:gsub(" stained hardened clay$", " terracotta")
   value=value:gsub(" stained clay$", " terracotta")
   value=value:gsub(" hardened clay$", " terracotta")
+  value=value:gsub(" hardned clay$", " terracotta")
+  if value=="hardened clay" or value=="stained hardened clay" or value=="hardned clay" or value=="stained clay" then
+    value="terracotta"
+  end
+  -- Older lists sometimes put "Block of" before the material name.
+  value=value:gsub("^block of (.+)$", "%1 block")
   value=value:gsub(" wood plank$", " planks")
   value=value:gsub(" wood slab$", " slab"):gsub(" wood stairs$", " stairs")
   value=value:gsub(" wood$", " log")
