@@ -406,6 +406,71 @@ local function select_material(block)
   end
   return false
 end
+local function chest_can_push_items(chest)
+  return chest and type(chest.list)=="function" and type(chest.pushItems)=="function"
+end
+local function selective_chest_pull(block)
+  local turtle_network_name=nil
+  for _,name in ipairs(peripheral.getNames()) do
+    if peripheral.getType(name)=="modem" then
+      local modem=peripheral.wrap(name)
+      if modem and type(modem.isWireless)=="function" and not modem.isWireless()
+          and type(modem.getNameLocal)=="function" then
+        local ok,value=pcall(modem.getNameLocal)
+        if ok and value then turtle_network_name=value; break end
+      end
+    end
+  end
+  if not turtle_network_name then return nil,"modem cabeado da Turtle nao conectado" end
+
+  for _,name in ipairs(peripheral.getNames()) do
+    local ok,methods=pcall(peripheral.getMethods,name)
+    if ok and type(methods)=="table" then
+      local available={}
+      for _,method in ipairs(methods) do available[method]=true end
+      if available.list and available.pushItems then
+        local chest=peripheral.wrap(name)
+        if chest_can_push_items(chest) then
+          local ok_list,items=pcall(chest.list)
+          if ok_list and type(items)=="table" then
+            for source_slot,item in pairs(items) do
+              if type(item)=="table" and item.name then
+                local wanted=block.item
+                local matches=item.name==wanted
+                if not matches then
+                  local details=item
+                  if type(chest.getItemDetail)=="function" then
+                    local detail_ok,detail=pcall(chest.getItemDetail,source_slot)
+                    if detail_ok and type(detail)=="table" then details=detail end
+                  end
+                  local label=match_name(details.displayName or item.name:match("[^:]+$"):gsub("_"," "))
+                  matches=label==match_name(block.name)
+                end
+                if matches then
+                  for target_slot=1,16 do
+                    local existing=turtle.getItemDetail(target_slot)
+                    local compatible=not existing or existing.name==item.name or existing.name==wanted
+                    local space=turtle.getItemSpace(target_slot)
+                    if compatible and space>0 then
+                      local limit=math.min(tonumber(item.count) or 64,space)
+                      local pushed_ok,pushed=pcall(chest.pushItems,turtle_network_name,source_slot,limit,target_slot)
+                      if pushed_ok and (tonumber(pushed) or 0)>0 then
+                        turtle.select(target_slot)
+                        return true
+                      end
+                    end
+                  end
+                  return false,"sem slot livre para "..wanted
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return false,"item ainda nao esta no bau"
+end
 local function fetch_material_from_ae2(block)
   if not config.supply_station then return false end
   local central_id=tonumber(config.supply_computer_id)
@@ -426,9 +491,9 @@ local function fetch_material_from_ae2(block)
   if supply_modem then
     local request_id=tostring(os.getComputerID()).."-"..tostring(os.epoch("utc"))
     local request={type="request",id=request_id,secret=config.supply_secret,item=block.item,count=64}
-    print("Solicitando ate 64 x "..block.item.." ao ME Bridge...")
+    print("Solicitando ate 64 x "..block.item.." ao computador de abastecimento...")
     if not rednet.send(central_id,request,supply_protocol) then
-      print("Falha ao enviar pedido ao computador AE2.")
+      print("Falha ao enviar pedido ao computador de abastecimento.")
       restore_work()
       return false
     end
@@ -441,39 +506,49 @@ local function fetch_material_from_ae2(block)
           print("Separado no ponto de carga: "..tostring(response.count or 64).." x "..block.item)
           delivered=true
         else
-          print("O ME Bridge nao forneceu o item: "..tostring(response.error or "erro desconhecido"))
+          print("O computador nao forneceu o item: "..tostring(response.error or "erro desconhecido"))
         end
         break
       elseif not sender then
         timeouts=timeouts+1
         if timeouts>=4 then
-          print("Despachante AE2 sem resposta. Vou tentar novamente durante a pausa.")
+          print("Despachante sem resposta. Vou tentar novamente durante a pausa.")
           restore_work()
           return false
         end
-        print("Aguardando o ME Bridge... reenviando pedido.")
+        print("Aguardando o despachante... reenviando pedido.")
         rednet.send(central_id,request,supply_protocol)
       end
     end
     if not delivered then restore_work(); return false end
   else
-    print("Aguardando "..block.item.." no bau abaixo da Turtle...")
+    print("Aguardando "..block.item.." no inventario conectado...")
   end
   while not select_material(block) do
-    local before={}
-    for slot=1,16 do
-      local detail=turtle.getItemDetail(slot)
-      if detail then before[detail.name]=(before[detail.name] or 0)+turtle.getItemCount(slot) end
-    end
-    turtle.suckDown()
-    if select_material(block) then break end
-    local changed=false
-    for slot=1,16 do
-      local detail=turtle.getItemDetail(slot)
-      if detail and turtle.getItemCount(slot)>(before[detail.name] or 0) then changed=true end
-    end
-    if not changed then
-      print("Sem item no bau inferior ou inventario cheio. Libere um slot; tento novamente.")
+    local pulled,why=selective_chest_pull(block)
+    if pulled==nil then
+      -- Keep a simple chest-only fallback for stations without wired modems.
+      local before={}
+      for slot=1,16 do
+        local detail=turtle.getItemDetail(slot)
+        if detail then before[detail.name]=(before[detail.name] or 0)+turtle.getItemCount(slot) end
+      end
+      turtle.suckDown()
+      if not select_material(block) then
+        local changed=false
+        for slot=1,16 do
+          local detail=turtle.getItemDetail(slot)
+          if detail and turtle.getItemCount(slot)>(before[detail.name] or 0) then changed=true end
+        end
+        if not changed then
+          print("Sem espaco/item no bau inferior. Libere um slot ou confira o abastecimento.")
+          sleep(3)
+        end
+      end
+    elseif not pulled then
+      if why=="sem slot livre para "..block.item then
+        print("Inventario cheio. Libere um slot para "..block.item.."; vou tentar novamente.")
+      end
       sleep(3)
     end
   end

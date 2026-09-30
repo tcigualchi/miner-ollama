@@ -1,4 +1,4 @@
-﻿# Construção de blueprints do GrabCraft via Turtle
+# Construção de blueprints do GrabCraft via Turtle
 
 O comando principal recebe uma página individual de blueprint, busca seu modelo 3D voxelizado, consulta a posição GPS da Turtle, confere materiais/combustível e constrói o modelo em camadas. Não há painel web nesta experiência; a resposta e o progresso aparecem no terminal da própria Turtle. O ngrok expõe apenas a API headless do PC central.
 
@@ -24,13 +24,13 @@ O reabastecimento automático vem ativado: mantenha carvão ou carvão vegetal e
 
 Para atualizar o comando da Turtle, execute novamente o mesmo comando `wget run .../install.lua ...`; ele substitui o programa local.
 
-## Abastecimento por baú
+## Abastecimento automatico por baus comuns
 
-Não é necessário usar o Wireless Crafting Terminal nem o ME Bridge. Monte um baú de abastecimento dedicado e coloque a Turtle em cima dele. Se quiser, funis podem alimentar esse baú a partir de outro baú, como na sua montagem. Reinstale o programa enquanto a Turtle estiver nesse ponto e responda `s` à pergunta sobre o baú manual; o instalador salva a posição por GPS. Depois, leve a Turtle até a construção.
+O computador central seleciona os itens; a Turtle nao precisa de modem cabeado. Monte uma rede cabeada do CC:Tweaked ligando um modem cabeado no Advanced Computer aos modems cabeados dos baus de materiais e do bau de entrega. Deixe tambem um modem wireless no Advanced Computer para receber pedidos rednet. O bau de entrega deve ficar diretamente abaixo da Turtle quando ela estiver na estacao; funis podem alimentar os baus de materiais.
 
-Quando faltar um bloco, ela retorna ao baú e usa `suckDown()` para puxar itens, depois volta ao bloco pendente. O CC:Tweaked não permite escolher qual stack puxar de um baú: ela coleta o próximo stack disponível. Por isso, mantenha o baú dedicado aos materiais da obra e deixe espaço nos 16 slots da Turtle. Se houver muitos tipos diferentes, a Turtle pode encher os slots com outros materiais antes de encontrar o que precisa; nesse caso, organize/reponha o baú ou libere slots durante a pausa. Obstáculos no caminho entre a obra e a estação também podem impedir o retorno.
+No Advanced Computer, use `peripheral.getNames()` para localizar o nome do bau de entrega. Baixe e inicie o despachante com `wget run https://SEU-NGROK/chest-supply.lua`. Na primeira execucao, informe uma chave compartilhada com pelo menos 8 caracteres e o nome do bau de entrega. Anote o ID exibido por `id` e use a mesma chave ao instalar a Turtle. O despachante procura o ID exato `minecraft:...` nos inventarios da rede cabeada e transfere ate 64 itens para o bau de entrega.
 
-Se no futuro quiser que ela escolha um item específico entre muitos tipos no AE2, isso exigirá o ME Bridge e o despachante opcional; o terminal wireless não expõe essa função à Turtle.
+Instale/reinstale o agente enquanto a Turtle estiver sobre o bau de entrega; informe o ID do Advanced Computer, a mesma chave e confirme a estacao manual. O GPS grava a posicao da estacao. Ao faltar um bloco, a Turtle volta, pede o material, recolhe do bau inferior com `suckDown()` e retorna a obra. Deixe espaco no inventario da Turtle; ele continua limitado a 16 slots. A rede cabeada precisa ligar os baus ao computador, mas nao precisa chegar a Turtle. O ME Bridge e opcional e nao e necessario neste fluxo.
 
 ## Limites do construtor
 

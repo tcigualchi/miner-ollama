@@ -19,7 +19,7 @@ if code < 200 or code >= 300 then print("Download falhou: HTTP " .. tostring(cod
 local file = fs.open("/grabcraft.lua", "w")
 file.write(source)
 file.close()
-print("ID do computador CC que executara o despachante AE2 (Enter para configurar depois):")
+print("ID do computador CC que executara o despachante de materiais (Enter para configurar depois):")
 write("> ")
 local station_id=tonumber(read())
 local supply_secret=nil
@@ -79,4 +79,4 @@ config.write(textutils.serialize({
 }, {compact = true}))
 config.close()
 print("Instalado. Use: grabcraft <link-direto-do-blueprint>")
-if station_id then print("Abastecimento AE2 configurado para o computador "..station_id..".") end
+if station_id then print("Abastecimento automatico configurado para o computador "..station_id..".") end
