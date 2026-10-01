@@ -88,6 +88,10 @@ end
 print("Lendo o modelo 3D do GrabCraft...")
 local info,why=post("/inspect",{url=url})
 if not info then print("Não foi possível ler o blueprint: "..tostring(why)); return end
+local function skip_material_name(name)
+  local value=tostring(name):lower():gsub("%s*%([^)]*%)", ""):gsub("_", " "):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+  return value=="ladder" or value:match(" ladder$")~=nil or value=="door" or value:match(" door$")~=nil
+end
 local dims=info.dimensions or {}
 print("Blueprint: "..tostring(info.title))
 print("Dimensões L x A x P: "..tostring(dims.width).." x "..tostring(dims.height).." x "..tostring(dims.depth))
@@ -99,7 +103,15 @@ if tonumber(info.ignored_block_count) and info.ignored_block_count>0 then
   end
 end
 print("Materiais necessários:")
-for _,item in ipairs(info.materials or {}) do print("  "..tostring(item.count).." x "..tostring(item.name)) end
+local skipped_materials={}
+for _,item in ipairs(info.materials or {}) do
+  if skip_material_name(item.name) then
+    skipped_materials[item.name]=(skipped_materials[item.name] or 0)+tonumber(item.count or 0)
+  else
+    print("  "..tostring(item.count).." x "..tostring(item.name))
+  end
+end
+for name,count in pairs(skipped_materials) do print("  Ignorando "..tostring(count).." x "..name) end
 
 if not tonumber(info.block_count) or info.block_count>12000 or not tonumber(dims.height) or dims.height>128 or not tonumber(dims.width) or dims.width>128 or not tonumber(dims.depth) or dims.depth>128 then
   print("Construção cancelada: modelo excede o limite seguro de 12000 blocos ou 128 blocos por dimensão.")
@@ -180,16 +192,22 @@ for _,mat in ipairs(info.materials or {}) do
   local is_ladder=source:lower():find("ladder",1,true)~=nil
   local is_torch=source:lower():find("torch",1,true)~=nil
   local id=canonical_id(source)
-  if canonical=="material not identified" or canonical=="material nao identificado" then
-    table.insert(unsupported,source.." (sem identificação de bloco)")
+  if skip_material_name(source) then
+    skipped_materials[source]=(skipped_materials[source] or 0)+0
+    -- Keep ladder ordering stable so saved construction cursors still resume.
+    if is_ladder and facing and ({north=true,east=true,south=true,west=true})[facing] then
+      side_mount[source]=facing
+    end
+  elseif canonical=="material not identified" or canonical=="material nao identificado" then
+    table.insert(unsupported,source.." (unidentified block)")
   else
     local is_wall_torch=is_torch and facing and facing~="up"
     if is_ladder or is_wall_torch then
-    if not facing or not ({north=true,east=true,south=true,west=true})[facing] then
-      table.insert(unsupported,source.." (orientação lateral não reconhecida)")
-    else
-      side_mount[source]=facing
-    end
+      if not facing or not ({north=true,east=true,south=true,west=true})[facing] then
+        table.insert(unsupported,source.." (unrecognized side orientation)")
+      else
+        side_mount[source]=facing
+      end
     end
     local chosen=nil
     if inv_by_id[id] then chosen=id end
@@ -206,6 +224,7 @@ for _,mat in ipairs(info.materials or {}) do
     if facing and ({north=true,east=true,south=true,west=true})[facing] then facing_by_name[source]=facing end
   end
 end
+
 if #unsupported>0 then
   print("\nConstrução cancelada antes de se mover.")
   for _,value in ipairs(unsupported) do print("  Não suportado: "..value) end
@@ -333,6 +352,7 @@ for layer=1,dims.height do
   if not data then print("Falha ao carregar camada "..layer..": "..tostring(err)); return end
   layers[layer]=data.blocks or {}
   for _,block in ipairs(layers[layer]) do
+    block.skip=skip_material_name(block.name)
     block.item=safe_material[block.name]
     block.target={x=start.x+block.x,y=start.y+layer,z=start.z+block.z}
     block.layer=layer
@@ -366,8 +386,10 @@ for layer=1,dims.height do
   end)
   for block_index,block in ipairs(layers[layer]) do
     if layer>resume_layer or (layer==resume_layer and block_index>=resume_index) then
-      movement_cost=movement_cost+math.abs(block.approach.x-prev.x)+math.abs(block.approach.y-prev.y)+math.abs(block.approach.z-prev.z)
-      prev=block.approach
+      if not block.skip then
+        movement_cost=movement_cost+math.abs(block.approach.x-prev.x)+math.abs(block.approach.y-prev.y)+math.abs(block.approach.z-prev.z)
+        prev=block.approach
+      end
     end
   end
 end
@@ -591,6 +613,9 @@ for layer=resume_layer,#layers do
   local first_index=layer==resume_layer and resume_index or 1
   for block_index=first_index,#layers[layer] do
     local block=layers[layer][block_index]
+    if block.skip then
+      report_progress()
+    else
     local ok,err=move_to(block.approach)
     if not ok then print("PAREI no GPS da camada "..layer..": "..tostring(err)); return end
     if is_side(block) then
@@ -630,6 +655,7 @@ for layer=resume_layer,#layers do
       if not success then print("PAREI ao colocar "..block.name..": "..tostring(place_error)); return end
       placed=placed+1
       report_progress()
+    end
     end
     local next_layer,next_index=layer,block_index+1
     if next_index>#layers[layer] then next_layer,next_index=layer+1,1 end
