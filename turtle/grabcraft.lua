@@ -132,6 +132,11 @@ local item_name_aliases={
   -- block item is minecraft:nether_bricks (singular is the crafting item).
   ["nether bricks"]="nether brick",
   ["stone bricks"]="stone brick",
+  -- The old generic wooden trapdoor became the oak variant when trapdoors
+  -- gained wood-specific variants. GrabCraft still emits the legacy label.
+  ["wooden trapdoor"]="oak trapdoor",
+  ["wood trapdoor"]="oak trapdoor",
+  ["trapdoor"]="oak trapdoor",
 }
 local function match_name(name)
   local value=clean_name(name)
@@ -153,7 +158,8 @@ for slot=1,16 do
 end
 
 local function canonical_id(label)
-  local cleaned=clean_name(label)
+  -- Keep generated IDs in sync with the aliases used for inventory matching.
+  local cleaned=match_name(label)
   if cleaned=="nether brick" then cleaned="nether_bricks" end
   if cleaned=="stone brick" then cleaned="stone_bricks" end
   cleaned=cleaned:gsub(" ","_")
